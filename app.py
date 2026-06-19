@@ -172,8 +172,7 @@ def draw(d):
         "",
         key=f"sch_{d}",
         placeholder="予定",
-        height=60
-    )
+        height=60)
     st.session_state.schedule[d] = val
 
 
