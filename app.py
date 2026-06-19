@@ -38,7 +38,7 @@ textarea {
     padding-left: 6px !important;
     padding-right: 6px !important;
     line-height: 1.1 !important;
-    font-size: 12px !important;
+    font-size: 9px !important;
     box-sizing: border-box !important;
 }
 
