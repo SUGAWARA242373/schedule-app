@@ -8,6 +8,21 @@ import os
 st.set_page_config(layout="wide")
 st.title("品質管理チーム月間スケジュール表")
 
+st.markdown("""
+<style>
+/* 年月（NumberInput） */
+div[data-testid="stNumberInput"] label {
+    font-size: 32px !important;   /* 「年」「月」 */
+    font-weight: bold !important;
+}
+div[data-testid="stNumberInput"] input {
+    font-size: 48px !important;   /* 2026 / 6 */
+    font-weight: bold !important;
+    height: 70px !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # =========================
 # 月設定
 # =========================
