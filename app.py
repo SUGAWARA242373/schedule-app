@@ -20,7 +20,7 @@ div[data-testid="stVerticalBlock"] {
 /* 当番（text_input） */
 div[data-testid="stTextInput"] input {
     height: 60px !important;
-    padding-top: 2px !important;
+    padding-top: 1px !important;
     padding-bottom: 2px !important;
     padding-left: 6px !important;
     padding-right: 6px !important;
@@ -161,7 +161,7 @@ def draw(d):
     with c1:
         color = get_color(d)
         today_mark = "★" if datetime.date(year, month, d) == today else ""
-        st.markdown(f"<div style='color:{color}; font-size:20px'>{d}{today_mark}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='color:{color}; font-size:22px'>{d}{today_mark}</div>", unsafe_allow_html=True)
 
     with c2:
         val = st.text_input("", key=f"duty_{d}", placeholder="当番")
