@@ -134,7 +134,7 @@ def get_color(d):
 # 表示
 # =========================
 def draw(d):
-    c1, c2, c3 = st.columns([1,2,6])
+    c1, c2, c3 = st.columns([1,1.5,6])
 
     with c1:
         color = get_color(d)
