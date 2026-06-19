@@ -168,7 +168,7 @@ def draw(d):
         st.session_state.duty[d] = val
 
     
-with c3:
+　　with c3:
         val = st.text_input("", key=f"sch_{d}", placeholder="予定")
         st.session_state.schedule[d] = val
 
