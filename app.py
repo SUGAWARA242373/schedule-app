@@ -8,18 +8,40 @@ import os
 st.set_page_config(layout="wide")
 st.title("品質管理チーム月間スケジュール表")
 
+
 st.markdown("""
 <style>
-/* 年月（NumberInput） */
-div[data-testid="stNumberInput"] label {
-    font-size: 32px !important;   /* 「年」「月」 */
-    font-weight: bold !important;
+
+/* 行と行の間（全体） */
+div[data-testid="stVerticalBlock"] {
+    gap: 0.02rem !important;
 }
-div[data-testid="stNumberInput"] input {
-    font-size: 48px !important;   /* 2026 / 6 */
-    font-weight: bold !important;
-    height: 70px !important;
+
+/* 当番（text_input） */
+div[data-testid="stTextInput"] input {
+    height: 60px !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+    line-height: 1.1 !important;
+    font-size: 18px !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
 }
+
+/* 予定（text_area） */
+textarea {
+    min-height: 60px !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+    line-height: 1.1 !important;
+    font-size: 18px !important;
+    box-sizing: border-box !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
