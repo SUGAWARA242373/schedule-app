@@ -169,13 +169,9 @@ def draw(d):
 
     
 with c3:
-    val = st.text_area(
-        "",
-        key=f"sch_{d}",
-        placeholder="予定",
-        height=60
-    )
-    st.session_state.schedule[d] = val
+        val = st.text_area("", key=f"sch_{d}", placeholder="予定", height=70)
+        st.session_state.schedule[d] = val
+
 
 # 表（左右2列）
 colL, colR = st.columns(2)
