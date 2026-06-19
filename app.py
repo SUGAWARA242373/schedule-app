@@ -19,7 +19,7 @@ div[data-testid="stVerticalBlock"] {
 
 /* 当番（text_input） */
 div[data-testid="stTextInput"] input {
-    height: 60px !important;
+    height: 50px !important;
     padding-top: 1px !important;
     padding-bottom: 2px !important;
     padding-left: 6px !important;
@@ -32,7 +32,7 @@ div[data-testid="stTextInput"] input {
 
 /* 予定（text_area） */
 textarea {
-    min-height: 60px !important;
+    min-height: 50px !important;
     padding-top: 2px !important;
     padding-bottom: 2px !important;
     padding-left: 6px !important;
