@@ -167,8 +167,7 @@ def draw(d):
         val = st.text_input("", key=f"duty_{d}", placeholder="当番")
         st.session_state.duty[d] = val
         
-   
-　　with c3:
+    with c3:
     val = st.text_area(
         "",
         key=f"sch_{d}",
