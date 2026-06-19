@@ -25,7 +25,7 @@ div[data-testid="stTextInput"] input {
     padding-left: 6px !important;
     padding-right: 6px !important;
     line-height: 1.1 !important;
-    font-size: 18px !important;
+    font-size: 22px !important;
     text-align: center !important;
     box-sizing: border-box !important;
 }
@@ -38,7 +38,7 @@ textarea {
     padding-left: 6px !important;
     padding-right: 6px !important;
     line-height: 1.1 !important;
-    font-size: 14px !important;
+    font-size: 16px !important;
     box-sizing: border-box !important;
 }
 
