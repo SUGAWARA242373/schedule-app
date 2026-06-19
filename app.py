@@ -191,6 +191,9 @@ with colR:
 # =========================
 # CSV保存
 # =========================
+# =========================
+# CSV保存
+# =========================
 if st.button("CSV保存"):
     df = pd.DataFrame({
         "日": list(range(1, days+1)),
@@ -198,8 +201,22 @@ if st.button("CSV保存"):
         "予定": [st.session_state.schedule[d] for d in range(1, days+1)]
     })
 
+    # ローカル保存（今まで通り）
     df.to_csv(f"schedule_{year}_{month}.csv", index=False)
-    st.success("保存完了")
+
+    # ✅ 追加：ダウンロード用CSV生成
+    csv = df.to_csv(index=False).encode("utf-8-sig")
+
+    st.download_button(
+        label="CSVダウンロード",
+        data=csv,
+        file_name=f"schedule_{year}_{month}.csv",
+        mime="text/csv"
+    )
+
+    st.success("保存完了（ダウンロード可）")
+
+
 
 # =========================
 # 全クリア（重要修正済）
