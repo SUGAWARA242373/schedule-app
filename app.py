@@ -167,9 +167,15 @@ def draw(d):
         val = st.text_input("", key=f"duty_{d}", placeholder="当番")
         st.session_state.duty[d] = val
 
-    with c3:
-        val = st.text_input("", key=f"sch_{d}", placeholder="予定")
-        st.session_state.schedule[d] = val
+    
+with c3:
+    val = st.text_area(
+        "",
+        key=f"sch_{d}",
+        placeholder="予定",
+        height=60
+    )
+    st.session_state.schedule[d] = val
 
 # 表（左右2列）
 colL, colR = st.columns(2)
