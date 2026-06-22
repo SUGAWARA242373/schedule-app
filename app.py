@@ -10,6 +10,7 @@ import jpholiday
 # ページ設定
 # =========================
 st.set_page_config(layout="wide")
+
 # =========================
 # 年月入力（ここが唯一）
 # =========================
@@ -19,6 +20,7 @@ month = st.number_input("月", 1, 12, 6, key="month_input")
 days = calendar.monthrange(year, month)[1]
 today = datetime.date.today()
 data_file = f"data_{year}_{month}.json"
+
 # =========================
 # タイトル・年月（大表示）
 # =========================
@@ -34,10 +36,8 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
-
 # =========================
-# CSS（1回だけ・コメント無し）
+# CSS（1回だけ）
 # =========================
 st.markdown("""
 <style>
@@ -149,7 +149,6 @@ def get_color(d):
 # =========================
 # 表示
 # =========================
-
 def draw(d):
     c1, c2, c3 = st.columns([1, 1.5, 6])
 
@@ -167,8 +166,6 @@ def draw(d):
     with c3:
         st.text_area("", key=f"sch_{d}", placeholder="予定", height=60)
 
-   
-
 colL, colR = st.columns(2)
 with colL:
     for d in range(1, min(16, days + 1)):
@@ -178,7 +175,7 @@ with colR:
         draw(d)
 
 # =========================
-# CSV保存
+# CSV保存・読込
 # =========================
 if st.button("CSV保存"):
     df = pd.DataFrame({
@@ -190,22 +187,17 @@ if st.button("CSV保存"):
     st.download_button("CSVダウンロード", csv, f"schedule_{year}_{month}.csv", "text/csv")
 
 uploaded = st.file_uploader("CSV読込", type="csv")
-
 if uploaded:
     df_in = pd.read_csv(uploaded)
-
     for _, row in df_in.iterrows():
         d = int(row["日"])
         if 1 <= d <= days:
             duty_val = "" if pd.isna(row["当番"]) else str(row["当番"])
             sch_val = "" if pd.isna(row["予定"]) else str(row["予定"])
-
             st.session_state.duty[d] = duty_val
             st.session_state.schedule[d] = sch_val
-
             st.session_state[f"duty_{d}"] = duty_val
             st.session_state[f"sch_{d}"] = sch_val
-
     st.success("CSVを読み込みました")
     st.rerun()
 
