@@ -118,25 +118,24 @@ def get_color(d):
     wd = datetime.date(year, month, d).weekday()
     return "blue" if wd == 5 else "red" if wd == 6 else "black"
 
+
 # =========================
 # CSV読込（最終・安全版）
 # =========================
 uploaded = st.file_uploader("CSV読込", type="csv")
 
-# ① CSVを選んだ瞬間：一時バッファに退避して rerun
 if uploaded is not None and "csv_pending" not in st.session_state:
     st.session_state["csv_buffer"] = pd.read_csv(uploaded)
     st.session_state["csv_pending"] = True
     st.rerun()
 
-# ② rerun後：ウィジェット生成前に state を反映
 if st.session_state.get("csv_pending", False):
     df_in = st.session_state.pop("csv_buffer")
     st.session_state.pop("csv_pending", None)
 
     for _, row in df_in.iterrows():
         d = int(row["日"])
-       if 1 <= d <= days:
+        if 1 <= d <= days:   # ← ★ここが重要
             st.session_state[f"duty_{d}"] = (
                 "" if pd.isna(row["当番"]) else str(row["当番"])
             )
