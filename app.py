@@ -56,14 +56,6 @@ if os.path.exists(data_file) and not st.session_state.get("loaded", False):
             st.session_state[k] = v
     st.session_state.loaded = True
 
-day_sel = st.sidebar.number_input(
-    "日付",
-    1,
-    days,
-    1,
-    key="day_select"
-)
-
 
 import streamlit as st
 import pandas as pd
