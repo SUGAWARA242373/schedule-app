@@ -5,7 +5,7 @@ import datetime
 import json
 import os
 import jpholiday
-st.write("### DEBUG: 2026-06-22 v2")
+
 # =================================================
 # ページ設定 & CSS
 # =================================================
@@ -130,14 +130,20 @@ templates = {
 temp = st.sidebar.selectbox("予定テンプレ", [""] + list(templates))
 day_sel = st.sidebar.number_input("日付", 1, days, 1)
 
+
 if st.sidebar.button("テンプレ入力"):
-    d = str(day_sel)
-    cur = st.session_state.data["schedule"][d]
-    st.session_state.data["schedule"][d] = (
-        templates[temp] if cur == "" else f"{cur} / {templates[temp]}"
-    )
-    st.session_state.pop(f"sch_{day_sel}", None)
-    st.rerun()
+    if temp == "":
+        st.warning("テンプレを選択してください")
+    else:
+        d = str(day_sel)
+        cur = st.session_state.data["schedule"].get(d, "")
+        new = templates[temp]
+        st.session_state.data["schedule"][d] = (
+            new if cur == "" else f"{cur} / {new}"
+        )
+        st.session_state.pop(f"sch_{day_sel}", None)
+        st.rerun()
+
 
 # --- 当番自動割当 ---
 start = st.sidebar.selectbox("開始当番（1日）", members)
@@ -177,6 +183,8 @@ st.sidebar.download_button(
     df.to_csv(index=False).encode("utf-8-sig"),
     file_name=f"schedule_{year}_{month}.csv"
 )
+
+up = st.sidebar.file_uploader("CSV読込", type="csv")
 
 up = st.sidebar.file_uploader("CSV読込", type="csv")
 if up:
