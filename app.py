@@ -1,3 +1,4 @@
+st.write("### DEBUG: 2026-06-22 v2")
 import streamlit as st
 import pandas as pd
 import calendar
