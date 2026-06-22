@@ -9,8 +9,6 @@ import jpholiday
 st.set_page_config(layout="wide")
 
 # 年月入力（唯一）
-year = st.number_input("年", value=2026)
-month = st.number_input("月", 1, 12, 6)
 
 days = calendar.monthrange(year, month)[1]
 today = datetime.date.today()
@@ -73,7 +71,9 @@ import jpholiday
 
 st.set_page_config(layout="wide")
 
-
+# 年月入力（唯一）
+year = st.number_input("年", value=2026)
+month = st.number_input("月", 1, 12, 6)
 
 days = calendar.monthrange(year, month)[1]
 today = datetime.date.today()
