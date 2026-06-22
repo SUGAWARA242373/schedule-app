@@ -16,9 +16,7 @@ import os
 
 st.set_page_config(layout="wide")
 
-# 年月入力（★key付き）
-year = st.number_input("年", value=2026, key="year_input")
-month = st.number_input("月", 1, 12, 6, key="month_input")
+
 
 # タイトル・年月表示（大）
 st.markdown(
