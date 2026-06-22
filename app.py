@@ -15,13 +15,17 @@ import os
 
 st.set_page_config(layout="wide")
 
-# ===== タイトル（大）=====
+# ✅ ① 年月入力（先に定義）
+year = st.number_input("年", value=2026, key="year_input")
+month = st.number_input("月", 1, 12, 6, key="month_input")
+
+# ✅ ② タイトル・年月（大きく表示）
 st.markdown(
     f"""
     <div style="
         font-size:48px;
         font-weight:800;
-        margin-bottom:4px;
+        margin-bottom:6px;
     ">
         品質管理チーム月間スケジュール表
     </div>
