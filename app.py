@@ -1,4 +1,5 @@
 import streamlit as st
+st.write("### ✅ CODE CHECK: 2026-06-22 FINAL")
 import pandas as pd
 import calendar
 import datetime
