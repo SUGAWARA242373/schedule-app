@@ -44,28 +44,20 @@ st.markdown("""
 div[data-testid="stVerticalBlock"] {
     gap: 0.02rem !important;
 }
-
 div[data-testid="stTextInput"] input {
     height: 50px !important;
-    padding: 2px 6px !important;
-    line-height: 1.1 !important;
     font-size: 22px !important;
     text-align: center !important;
-    box-sizing: border-box !important;
 }
-
 textarea {
     min-height: 50px !important;
-    padding: 2px 6px !important;
-    line-height: 1.1 !important;
     font-size: 16px !important;
-    box-sizing: border-box !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
 # =========================
-# 初期化
+# データ初期化
 # =========================
 if "schedule" not in st.session_state:
     st.session_state.schedule = {}
@@ -95,7 +87,16 @@ if os.path.exists(data_file) and not st.session_state.get("loaded", False):
     st.session_state.loaded = True
 
 # =========================
-# サイドバー：操作
+# 保存用コールバック（★重要）
+# =========================
+def update_duty(d):
+    st.session_state.duty[d] = st.session_state[f"duty_{d}"]
+
+def update_schedule(d):
+    st.session_state.schedule[d] = st.session_state[f"sch_{d}"]
+
+# =========================
+# サイドバー操作
 # =========================
 st.sidebar.header("操作")
 
@@ -147,15 +148,8 @@ def get_color(d):
     return "black"
 
 # =========================
-# 表示
+# 表示（★保存しない）
 # =========================
-
-def update_duty(d):
-    st.session_state.duty[d] = st.session_state[f"duty_{d}"]
-
-def update_schedule(d):
-    st.session_state.schedule[d] = st.session_state[f"sch_{d}"]
-
 def draw(d):
     c1, c2, c3 = st.columns([1, 1.5, 6])
 
@@ -186,6 +180,13 @@ def draw(d):
             args=(d,)
         )
 
+colL, colR = st.columns(2)
+with colL:
+    for d in range(1, min(16, days + 1)):
+        draw(d)
+with colR:
+    for d in range(16, days + 1):
+        draw(d)
 
 # =========================
 # CSV保存・読込
