@@ -1,4 +1,3 @@
-st.write("### DEBUG: 2026-06-22 v2")
 import streamlit as st
 import pandas as pd
 import calendar
@@ -6,7 +5,7 @@ import datetime
 import json
 import os
 import jpholiday
-
+st.write("### DEBUG: 2026-06-22 v2")
 # =================================================
 # ページ設定 & CSS
 # =================================================
