@@ -16,17 +16,25 @@ st.set_page_config(layout="wide")
 st.title("品質管理チーム月間スケジュール表")
 
 
-st.markdown("""
-<style>
-
-div[data-testid="stVerticalBlock"] {
-    gap: 0.02rem !important;
-
-st.markdown("""
-<style>
-div[data-testid="stVerticalBlock"] {
-    gap: 0.02rem !important;
-}
+st.markdown(
+    f"""
+    <div style="
+        font-size:48px;
+        font-weight:800;
+        margin-bottom:4px;
+    ">
+        品質管理チーム月間スケジュール表
+    </div>
+    <div style="
+        font-size:40px;
+        font-weight:700;
+        margin-bottom:24px;
+    ">
+        {year}年 {month}月
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 div[data-testid="stTextInput"] input {
     height: 50px !important;
