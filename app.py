@@ -182,17 +182,22 @@ if st.button("CSV保存"):
     csv = df.to_csv(index=False).encode("utf-8-sig")
     st.download_button("CSVダウンロード", csv, f"schedule_{year}_{month}.csv", "text/csv")
 
-# CSV読込（安全版）
 uploaded = st.file_uploader("CSV読込", type="csv")
-if uploaded:
+
+if uploaded is not None:
     df_in = pd.read_csv(uploaded)
+
     for _, row in df_in.iterrows():
         d = int(row["日"])
         if 1 <= d <= days:
-            st.session_state[f"duty_{d}"] = "" if pd.isna(row["当番"]) else str(row["当番"])
-            st.session_state[f"sch_{d}"] = "" if pd.isna(row["予定"]) else str(row["予定"])
+            st.session_state[f"duty_{d}"] = (
+                "" if pd.isna(row["当番"]) else str(row["当番"])
+            )
+            st.session_state[f"sch_{d}"] = (
+                "" if pd.isna(row["予定"]) else str(row["予定"])
+            )
+
     st.success("CSVを読み込みました")
-    st.rerun()
 
 # 自動保存
 save_data = {k: v for k, v in st.session_state.items() if k.startswith("duty_") or k.startswith("sch_")}
