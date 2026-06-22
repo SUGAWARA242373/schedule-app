@@ -190,25 +190,7 @@ st.markdown(
     </div>
     """,
     unsafe_allow_html=True
-)
-
-
-    with c2:
-        st.text_input(
-            "",
-            key=f"duty_{d}",
-            placeholder="当番"
-        )
-
-    with c3:
-        st.text_area(
-            "",
-            key=f"sch_{d}",
-            placeholder="予定",
-            height=60
-        )
-
-
+      )
 
 
 # 表（左右2列）
