@@ -92,14 +92,7 @@ days = calendar.monthrange(year, month)[1]
 today = datetime.date.today()
 data_file = f"data_{year}_{month}.json"
 
-# タイトル
-st.markdown(
-    f"""
-    <div style="font-size:40px;font-weight:800;">品質管理チーム月間スケジュール表</div>
-    <div style="font-size:32px;margin-bottom:20px;">{year}年 {month}月</div>
-    """,
-    unsafe_allow_html=True
-)
+
 
 # CSS
 st.markdown("""
