@@ -56,11 +56,6 @@ if os.path.exists(data_file) and not st.session_state.get("loaded", False):
             st.session_state[k] = v
     st.session_state.loaded = True
 
-temp = st.sidebar.selectbox(
-    "予定テンプレ",
-    templates,
-    key="template_select"
-)
 
 day_sel = st.sidebar.number_input(
     "日付",
