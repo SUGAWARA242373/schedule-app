@@ -198,21 +198,23 @@ def draw_day(d):
         )
 
     with c2:
-        val = st.text_input(
+        st.text_input(
             "",
             value=st.session_state.data["duty"][key],
             key=f"duty_{d}",
-            label_visibility="collapsed"
+            label_visibility="collapsed",
+            on_change=update_duty,
+            args=(key,)
         )
-        if val != st.session_state.data["duty"][key]:
-            st.session_state.data["duty"][key] = val
 
     with c3:
-        val = st.text_input(
+        st.text_input(
             "",
             value=st.session_state.data["schedule"][key],
             key=f"sch_{d}",
-            label_visibility="collapsed"
+            label_visibility="collapsed",
+            on_change=update_schedule,
+            args=(key,)
         )
         if val != st.session_state.data["schedule"][key]:
             st.session_state.data["schedule"][key] = val
