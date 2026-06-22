@@ -60,7 +60,13 @@ if os.path.exists(data_file) and not st.session_state.get("loaded", False):
 st.sidebar.header("操作")
 
 templates = ["", "うわかい", "外船", "チーム会議", "安全衛生委員会", "在庫調査日"]
-temp = st.sidebar.selectbox("予定テンプレ", templates)
+
+temp = st.sidebar.selectbox(
+    "予定テンプレ",
+    templates,
+    key="template_select"
+)
+
 day_sel = st.sidebar.number_input("日付", 1, days, 1)
 
 import streamlit as st
