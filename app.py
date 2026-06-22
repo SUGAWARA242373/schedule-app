@@ -66,6 +66,13 @@ if os.path.exists(data_file) and not st.session_state.loaded:
         st.session_state.data = json.load(f)
     st.session_state.loaded = True
 
+# ★ 必ず補完 ★
+st.session_state.data.setdefault("month", {})
+st.session_state.data["month"].setdefault("start", "")
+st.session_state.data["month"].setdefault("container", [])
+st.session_state.data["month"].setdefault("sample", [])
+st.session_state.data["month"].setdefault("oil", [])
+
 for d in range(1, days+1):
     st.session_state.data["schedule"].setdefault(str(d), "")
     st.session_state.data["duty"].setdefault(str(d), "")
