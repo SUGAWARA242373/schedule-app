@@ -33,6 +33,8 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+st.markdown("""
+<style>
 
 /* 行と行の間（全体） */
 div[data-testid="stVerticalBlock"] {
