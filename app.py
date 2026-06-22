@@ -135,6 +135,7 @@ with st.sidebar.container(border=True):
         )
     )
 
+
 def multi(title, key):
     st.sidebar.markdown(f"### {title}")
     with st.sidebar.container(border=True):
@@ -142,8 +143,10 @@ def multi(title, key):
             "開始当番のメンバーから最大3名を選択",
             members,
             max_selections=3,
-            default=st.session_state.month_settings.get(key, [])
+            default=st.session_state.month_settings.get(key, []),
+            key=f"month_{key}"   # ← 重複防止
         )
+
 
 multi("容器", "container")
 multi("サンプル", "sample")
