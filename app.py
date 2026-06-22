@@ -149,6 +149,7 @@ def get_color(d):
 # =========================
 # 表示
 # =========================
+
 def draw(d):
     c1, c2, c3 = st.columns([1, 1.5, 6])
 
@@ -166,8 +167,7 @@ def draw(d):
     with c3:
         st.text_area("", key=f"sch_{d}", placeholder="予定", height=60)
 
-    st.session_state.duty[d] = st.session_state.get(f"duty_{d}", "")
-    st.session_state.schedule[d] = st.session_state.get(f"sch_{d}", "")
+   
 
 colL, colR = st.columns(2)
 with colL:
