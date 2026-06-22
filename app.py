@@ -4,109 +4,86 @@ import calendar
 import datetime
 import json
 import os
+import jpholiday
 
+# =================================================
+# 基本設定
+# =================================================
 st.set_page_config(layout="wide")
-st.title("品質管理チーム月間スケジュール表")
+st.title("品質管理チーム 月間スケジュール（Web版）")
 
+DATA_DIR = "data"
+os.makedirs(DATA_DIR, exist_ok=True)
 
-st.markdown("""
-<style>
-
-/* 行と行の間（全体） */
-div[data-testid="stVerticalBlock"] {
-    gap: 0.02rem !important;
-}
-
-/* 当番（text_input） */
-div[data-testid="stTextInput"] input {
-    height: 50px !important;
-    padding-top: 1px !important;
-    padding-bottom: 2px !important;
-    padding-left: 6px !important;
-    padding-right: 6px !important;
-    line-height: 1.1 !important;
-    font-size: 22px !important;
-    text-align: center !important;
-    box-sizing: border-box !important;
-}
-
-/* 予定（text_area） */
-textarea {
-    min-height: 50px !important;
-    padding-top: 2px !important;
-    padding-bottom: 2px !important;
-    padding-left: 6px !important;
-    padding-right: 6px !important;
-    line-height: 1.1 !important;
-    font-size: 16px !important;
-    box-sizing: border-box !important;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-# =========================
-# 月設定
-# =========================
-year = st.number_input("年", value=2026)
-month = st.number_input("月", 1, 12, 6)
+# =================================================
+# 年月選択
+# =================================================
+year = st.number_input("年", value=2026, step=1)
+month = st.number_input("月", min_value=1, max_value=12, value=6)
 
 days = calendar.monthrange(year, month)[1]
 today = datetime.date.today()
 
-data_file = f"data_{year}_{month}.json"
+data_file = f"{DATA_DIR}/data_{year}_{month}.json"
 
-# =========================
-# 初期化（安全版）
-# =========================
-if "schedule" not in st.session_state:
-    st.session_state.schedule = {}
+# =================================================
+# 月変更検知（Webツールの要）
+# =================================================
+if (
+    "prev_year" not in st.session_state
+    or st.session_state.prev_year != year
+    or st.session_state.prev_month != month
+):
+    st.session_state.clear()
+    st.session_state.prev_year = year
+    st.session_state.prev_month = month
+    st.session_state.loaded = False
 
-if "duty" not in st.session_state:
-    st.session_state.duty = {}
+# =================================================
+# 初期化
+# =================================================
+st.session_state.setdefault("schedule", {})
+st.session_state.setdefault("duty", {})
+st.session_state.setdefault("month_settings", {})
 
-# 日数分補完（KeyError防止）
-for d in range(1, days+1):
+for d in range(1, days + 1):
     st.session_state.schedule.setdefault(d, "")
     st.session_state.duty.setdefault(d, "")
+    st.session_state.setdefault(f"sch_{d}", "")
+    st.session_state.setdefault(f"duty_{d}", "")
 
-# =========================
-# UIキー初期化（超重要）
-# =========================
-for d in range(1, days+1):
-    st.session_state.setdefault(f"duty_{d}", st.session_state.duty.get(d, ""))
-    st.session_state.setdefault(f"sch_{d}", st.session_state.schedule.get(d, ""))
-
-# =========================
-# 初回ロード
-# =========================
-if os.path.exists(data_file) and "loaded" not in st.session_state:
+# =================================================
+# データロード
+# =================================================
+if os.path.exists(data_file) and not st.session_state.loaded:
     with open(data_file, "r", encoding="utf-8") as f:
         data = json.load(f)
 
-        for k, v in data.get("schedule", {}).items():
-            d = int(k)
-            st.session_state.schedule[d] = v
-            st.session_state[f"sch_{d}"] = v
+    for k, v in data.get("schedule", {}).items():
+        d = int(k)
+        st.session_state.schedule[d] = v
+        st.session_state[f"sch_{d}"] = v
 
-        for k, v in data.get("duty", {}).items():
-            d = int(k)
-            st.session_state.duty[d] = v
-            st.session_state[f"duty_{d}"] = v
+    for k, v in data.get("duty", {}).items():
+        d = int(k)
+        st.session_state.duty[d] = v
+        st.session_state[f"duty_{d}"] = v
 
+    st.session_state.month_settings = data.get("month_settings", {})
     st.session_state.loaded = True
 
-# =========================
-# サイドバー：テンプレ
-# =========================
+# =================================================
+# サイドバー（操作パネル）
+# =================================================
 st.sidebar.header("操作")
 
+# --- テンプレ入力 ---
 templates = {
     "うわかい": "うわかい",
     "外船": "外船",
     "チーム会議": "チーム会議",
     "安全衛生委員会": "安全衛生委員会",
-    "在庫調査日": "在庫調査日"
+    "在庫調査日": "在庫調査日",
 }
 
 temp = st.sidebar.selectbox("予定テンプレ", [""] + list(templates.keys()))
@@ -114,37 +91,68 @@ day_sel = st.sidebar.number_input("日付", 1, days, 1)
 
 if st.sidebar.button("テンプレ入力"):
     if temp:
-        if st.session_state.schedule[day_sel] == "":
-            val = templates[temp]
-        else:
-            val = st.session_state.schedule[day_sel] + " / " + templates[temp]
-
+        cur = st.session_state.schedule[day_sel]
+        val = templates[temp] if cur == "" else f"{cur} / {templates[temp]}"
         st.session_state.schedule[day_sel] = val
         st.session_state[f"sch_{day_sel}"] = val
-
     st.rerun()
 
-# =========================
-# 当番自動ローテ
-# =========================
+# --- 当番自動割当 ---
 members = ["菅原","阿部","澤","畠山","猿田","谷川","村手","武藤","小笠原","藤田"]
 
-start = st.sidebar.selectbox("開始当番（1日）", members)
+start_member = st.sidebar.selectbox("開始当番（1日）", members)
 
 if st.sidebar.button("当番自動割当"):
-    idx = members.index(start)
+    idx = members.index(start_member)
 
-    for d in range(1, days+1):
-        val = members[(idx+d-1) % len(members)]
-        st.session_state.duty[d] = val
-        st.session_state[f"duty_{d}"] = val
+    for d in range(1, days + 1):
+        date = datetime.date(year, month, d)
+
+        if date.weekday() >= 5 or jpholiday.is_holiday(date):
+            st.session_state.duty[d] = ""
+            st.session_state[f"duty_{d}"] = ""
+            continue
+
+        name = members[idx % len(members)]
+        st.session_state.duty[d] = name
+        st.session_state[f"duty_{d}"] = name
+        idx += 1
 
     st.rerun()
 
-# =========================
-# 曜日色
-# =========================
-def get_color(d):
+# =================================================
+# 月次設定（左下ブロック）
+# =================================================
+st.sidebar.markdown("<div style='margin-top:40px'></div>", unsafe_allow_html=True)
+
+st.sidebar.markdown("### 月次当番")
+with st.sidebar.container(border=True):
+    st.session_state.month_settings["month_start"] = st.selectbox(
+        "開始当番のメンバーを選択",
+        members,
+        index=members.index(
+            st.session_state.month_settings.get("month_start", members[0])
+        )
+    )
+
+def multi(title, key):
+    st.sidebar.markdown(f"### {title}")
+    with st.sidebar.container(border=True):
+        st.session_state.month_settings[key] = st.multiselect(
+            "開始当番のメンバーから最大3名を選択",
+            members,
+            max_selections=3,
+            default=st.session_state.month_settings.get(key, [])
+        )
+
+multi("容器", "container")
+multi("サンプル", "sample")
+multi("灯油", "oil")
+
+# =================================================
+# 表示部
+# =================================================
+def day_color(d):
     wd = datetime.date(year, month, d).weekday()
     if wd == 5:
         return "blue"
@@ -152,97 +160,63 @@ def get_color(d):
         return "red"
     return "black"
 
-# =========================
-# 表示
-# =========================
-def draw(d):
-    c1, c2, c3 = st.columns([1,1.5,6])
-
+def draw_day(d):
+    c1, c2, c3 = st.columns([1, 2, 6])
     with c1:
-        color = get_color(d)
-        today_mark = "★" if datetime.date(year, month, d) == today else ""
-        st.markdown(f"<div style='color:{color}; font-size:22px'>{d}{today_mark}</div>", unsafe_allow_html=True)
-
+        mark = "★" if datetime.date(year, month, d) == today else ""
+        st.markdown(
+            f"<div style='color:{day_color(d)}; font-size:28px'>{d}{mark}</div>",
+            unsafe_allow_html=True,
+        )
     with c2:
-        val = st.text_input("", key=f"duty_{d}", placeholder="当番")
-        st.session_state.duty[d] = val
+        st.session_state.duty[d] = st.text_input("", key=f"duty_{d}")
     with c3:
-        val = st.text_area(
-        "",
-        key=f"sch_{d}",
-        placeholder="予定",
-        height=60
-    )
-    st.session_state.schedule[d] = val
+        st.session_state.schedule[d] = st.text_input("", key=f"sch_{d}")
 
-
-
-# 表（左右2列）
 colL, colR = st.columns(2)
-
 with colL:
-    for d in range(1, min(16, days+1)):
-        draw(d)
-
+    for d in range(1, min(16, days + 1)):
+        draw_day(d)
 with colR:
-    for d in range(16, days+1):
-        draw(d)
+    for d in range(16, days + 1):
+        draw_day(d)
 
-# =========================
-# CSV保存
-# =========================
-# =========================
-# CSV保存
-# =========================
-if st.button("CSV保存"):
-    df = pd.DataFrame({
-        "日": list(range(1, days+1)),
-        "当番": [st.session_state.duty[d] for d in range(1, days+1)],
-        "予定": [st.session_state.schedule[d] for d in range(1, days+1)]
-    })
+# =================================================
+# CSV入出力
+# =================================================
+st.sidebar.markdown("---")
+uploaded = st.sidebar.file_uploader("CSV読込", type="csv")
 
-    # ローカル保存（今まで通り）
-    df.to_csv(f"schedule_{year}_{month}.csv", index=False)
-
-    # ✅ 追加：ダウンロード用CSV生成
-    csv = df.to_csv(index=False).encode("utf-8-sig")
-
-    st.download_button(
-        label="CSVダウンロード",
-        data=csv,
-        file_name=f"schedule_{year}_{month}.csv",
-        mime="text/csv"
-    )
-
-    st.success("保存完了（ダウンロード可）")
-
-
-
-# =========================
-# 全クリア（重要修正済）
-# =========================
-if st.button("全クリア"):
-    for d in range(1, days+1):
-
-        st.session_state.schedule[d] = ""
-        st.session_state.duty[d] = ""
-
-        if f"duty_{d}" in st.session_state:
-            del st.session_state[f"duty_{d}"]
-
-        if f"sch_{d}" in st.session_state:
-            del st.session_state[f"sch_{d}"]
-
+if uploaded:
+    df = pd.read_csv(uploaded)
+    for _, r in df.iterrows():
+        d = int(r["日"])
+        st.session_state.duty[d] = str(r["当番"]) if not pd.isna(r["当番"]) else ""
+        st.session_state.schedule[d] = str(r["予定"]) if not pd.isna(r["予定"]) else ""
+        st.session_state[f"duty_{d}"] = st.session_state.duty[d]
+        st.session_state[f"sch_{d}"] = st.session_state.schedule[d]
     st.rerun()
 
-# =========================
-# 自動保存
-# =========================
-data = {
-    "schedule": st.session_state.schedule,
-    "duty": st.session_state.duty
-}
+if st.button("CSV保存"):
+    df = pd.DataFrame({
+        "日": range(1, days + 1),
+        "当番": [st.session_state.duty[d] for d in range(1, days + 1)],
+        "予定": [st.session_state.schedule[d] for d in range(1, days + 1)],
+    })
+    df.to_csv(f"schedule_{year}_{month}.csv", index=False)
+    st.success("CSV保存完了")
 
+# =================================================
+# 自動保存（Webツール必須）
+# =================================================
 with open(data_file, "w", encoding="utf-8") as f:
-    json.dump(data, f, ensure_ascii=False, indent=2)
-
+    json.dump(
+        {
+            "schedule": st.session_state.schedule,
+            "duty": st.session_state.duty,
+            "month_settings": st.session_state.month_settings,
+        },
+        f,
+        ensure_ascii=False,
+        indent=2,
+    )
