@@ -230,4 +230,3 @@ with right:
 # =========================
 with open(data_file, "w", encoding="utf-8") as f:
     json.dump(st.session_state.data, f, ensure_ascii=False, indent=2)
-``
