@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 import calendar
 import datetime
 
@@ -18,7 +19,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# widget state だけを使う（他の保存先なし）
+# widget state だけを使う
 for d in range(1, days + 1):
     st.session_state.setdefault(f"duty_{d}", "")
     st.session_state.setdefault(f"sch_{d}", "")
@@ -43,6 +44,27 @@ with colL:
 with colR:
     for d in range(16, days + 1):
         draw(d)
+
+# =========================
+# CSV保存（★ここだけ追加）
+# =========================
+st.markdown("---")
+if st.button("CSV保存"):
+    df = pd.DataFrame({
+        "日": list(range(1, days + 1)),
+        "当番": [st.session_state[f"duty_{d}"] for d in range(1, days + 1)],
+        "予定": [st.session_state[f"sch_{d}"] for d in range(1, days + 1)],
+    })
+
+    csv = df.to_csv(index=False).encode("utf-8-sig")
+
+    st.download_button(
+        "CSVダウンロード",
+        csv,
+        f"schedule_{year}_{month}.csv",
+        "text/csv"
+    )
+
 
 # =========================
 # CSV保存・読込
