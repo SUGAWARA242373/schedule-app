@@ -179,13 +179,22 @@ if st.button("CSV保存"):
         "text/csv"
     )
 
+
 # =========================
-# CSV読込（改善版・安定）
+# CSV読込（Streamlit安全版）
 # =========================
 uploaded = st.file_uploader("CSV読込", type="csv")
 
-if uploaded is not None:
-    df_in = pd.read_csv(uploaded)
+# ① CSVを読み込んだ瞬間：一時バッファに退避
+if uploaded is not None and "csv_buffer" not in st.session_state:
+    st.session_state["csv_buffer"] = pd.read_csv(uploaded)
+    st.session_state["csv_apply"] = True
+    st.rerun()
+
+# ② rerun後：widget生成前に state を反映
+if st.session_state.get("csv_apply", False):
+    df_in = st.session_state.pop("csv_buffer")
+    st.session_state.pop("csv_apply", None)
 
     for _, row in df_in.iterrows():
         d = int(row["日"])
