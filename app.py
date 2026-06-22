@@ -10,15 +10,15 @@ import jpholiday
 # ページ設定
 # =========================
 st.set_page_config(layout="wide")
-
 # =========================
-# 年月入力（1か所だけ）
+# 年月入力（ここが唯一）
 # =========================
+year = st.number_input("年", value=2026, key="year_input")
+month = st.number_input("月", 1, 12, 6, key="month_input")
 
 days = calendar.monthrange(year, month)[1]
 today = datetime.date.today()
 data_file = f"data_{year}_{month}.json"
-
 # =========================
 # タイトル・年月（大表示）
 # =========================
@@ -34,15 +34,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# =========================
-# 年月入力（ここが唯一）
-# =========================
-year = st.number_input("年", value=2026, key="year_input")
-month = st.number_input("月", 1, 12, 6, key="month_input")
 
-days = calendar.monthrange(year, month)[1]
-today = datetime.date.today()
-data_file = f"data_{year}_{month}.json"
 
 # =========================
 # CSS（1回だけ・コメント無し）
