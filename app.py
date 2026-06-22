@@ -21,7 +21,7 @@ st.set_page_config(layout="wide")
 
 
 
-# タイトル・年月表示（大）
+
 st.markdown(
     f"""
     <div style="font-size:42px;font-weight:700;">
