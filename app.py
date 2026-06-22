@@ -13,29 +13,13 @@ import os
 
 # ✅ CSS（入力欄用）
 
-Ｙear = st.number_input("年", value=2026)
-month = st.number_input("月", 1, 12, 6)
-
-
 st.set_page_config(layout="wide")
+st.title("品質管理チーム月間スケジュール表")
 
-
-
-
-st.markdown(
-    f"""
-    <div style="font-size:42px;font-weight:700;">
-        品質管理チーム月間スケジュール表
-    </div>
-    <div style="font-size:34px;font-weight:600;margin-bottom:20px;">
-        {year}年 {month}月
-    </div>
-    """,
-    unsafe_allow_html=True
-)
 
 st.markdown("""
 <style>
+
 
 /* 行と行の間（全体） */
 div[data-testid="stVerticalBlock"] {
