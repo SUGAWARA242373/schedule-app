@@ -13,37 +13,12 @@ import os
 
 # ✅ CSS（入力欄用）
 
-st.set_page_config(layout="wide")
-st.title("品質管理チーム月間スケジュール表")
-
-
-
 st.markdown("""
 <style>
 div[data-testid="stVerticalBlock"] {
     gap: 0.02rem !important;
 }
 
-div[data-testid="stTextInput"] input {
-    height: 50px !important;
-    font-size: 22px !important;
-}
-
-textarea {
-    min-height: 50px !important;
-    font-size: 16px !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
-
-
-/* 行と行の間（全体） */
-div[data-testid="stVerticalBlock"] {
-    gap: 0.02rem !important;
-}
-
-/* 当番（text_input） */
 div[data-testid="stTextInput"] input {
     height: 50px !important;
     padding-top: 1px !important;
@@ -56,7 +31,6 @@ div[data-testid="stTextInput"] input {
     box-sizing: border-box !important;
 }
 
-/* 予定（text_area） */
 textarea {
     min-height: 50px !important;
     padding-top: 2px !important;
@@ -67,7 +41,6 @@ textarea {
     font-size: 16px !important;
     box-sizing: border-box !important;
 }
-
 </style>
 """, unsafe_allow_html=True)
 
