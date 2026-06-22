@@ -1,141 +1,40 @@
 import streamlit as st
-import pandas as pd
 import calendar
 import datetime
-import json
-import os
-import jpholiday
 
-# =========================
-# ページ設定
-# =========================
 st.set_page_config(layout="wide")
 
-# =========================
-# 年月入力（ここが唯一）
-# =========================
-year = st.number_input("年", value=2026, key="year")
-month = st.number_input("月", 1, 12, 6, key="month")
-
+# 年月
+year = st.number_input("年", value=2026)
+month = st.number_input("月", 1, 12, 6)
 days = calendar.monthrange(year, month)[1]
 today = datetime.date.today()
-data_file = f"data_{year}_{month}.json"
 
-# =========================
-# タイトル・年月（大表示）
-# =========================
 st.markdown(
     f"""
-    <div style="font-size:48px;font-weight:800;margin-bottom:4px;">
-        品質管理チーム月間スケジュール表
-    </div>
-    <div style="font-size:40px;font-weight:700;margin-bottom:24px;">
-        {year}年 {month}月
-    </div>
+    <div style="font-size:40px;font-weight:800;">品質管理チーム月間スケジュール表</div>
+    <div style="font-size:32px;margin-bottom:20px;">{year}年 {month}月</div>
     """,
     unsafe_allow_html=True
 )
 
-# =========================
-# CSS（1回だけ）
-# =========================
-st.markdown("""
-<style>
-div[data-testid="stVerticalBlock"] {
-    gap: 0.02rem !important;
-}
-div[data-testid="stTextInput"] input {
-    height: 48px !important;
-    font-size: 22px !important;
-    text-align: center !important;
-}
-textarea {
-    min-height: 50px !important;
-    font-size: 16px !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# =========================
-# widget state 初期化（唯一のデータ）
-# =========================
+# widget state だけを使う（他の保存先なし）
 for d in range(1, days + 1):
     st.session_state.setdefault(f"duty_{d}", "")
     st.session_state.setdefault(f"sch_{d}", "")
 
-# =========================
-# JSONロード（初回のみ）
-# =========================
-if os.path.exists(data_file) and not st.session_state.get("loaded", False):
-    with open(data_file, "r", encoding="utf-8") as f:
-        data = json.load(f)
-        for k, v in data.items():
-            st.session_state[k] = v
-    st.session_state.loaded = True
-
-# =========================
-# サイドバー操作
-# =========================
-st.sidebar.header("操作")
-
-templates = ["", "うわかい", "外船", "チーム会議", "安全衛生委員会", "在庫調査日"]
-temp = st.sidebar.selectbox("予定テンプレ", templates)
-day_sel = st.sidebar.number_input("日付", 1, days, 1)
-
-if st.sidebar.button("テンプレ入力") and temp:
-    cur = st.session_state[f"sch_{day_sel}"]
-    st.session_state[f"sch_{day_sel}"] = temp if cur == "" else f"{cur} / {temp}"
-    st.rerun()
-
-members = ["菅原","阿部","澤","畠山","猿田","谷川","村手","武藤","小笠原","藤田"]
-start = st.sidebar.selectbox("開始当番（1日）", members)
-
-if st.sidebar.button("当番自動割当（平日のみ）"):
-    idx = members.index(start)
-    for d in range(1, days + 1):
-        date = datetime.date(year, month, d)
-        if date.weekday() >= 5 or jpholiday.is_holiday(date):
-            st.session_state[f"duty_{d}"] = ""
-        else:
-            st.session_state[f"duty_{d}"] = members[idx % len(members)]
-            idx += 1
-    st.rerun()
-
-if st.sidebar.button("全クリア"):
-    for d in range(1, days + 1):
-        st.session_state[f"duty_{d}"] = ""
-        st.session_state[f"sch_{d}"] = ""
-    st.rerun()
-
-# =========================
-# 曜日色
-# =========================
-def get_color(d):
-    wd = datetime.date(year, month, d).weekday()
-    if wd == 5:
-        return "blue"
-    if wd == 6:
-        return "red"
-    return "black"
-
-# =========================
-# 表示（保存処理なし）
-# =========================
 def draw(d):
-    c1, c2, c3 = st.columns([1, 1.5, 6])
+    c1, c2, c3 = st.columns([1, 2, 6])
 
     with c1:
         mark = "★" if datetime.date(year, month, d) == today else ""
-        st.markdown(
-            f"<div style='color:{get_color(d)};font-size:22px'>{d}{mark}</div>",
-            unsafe_allow_html=True
-        )
+        st.markdown(f"<b>{d}{mark}</b>", unsafe_allow_html=True)
 
     with c2:
         st.text_input("", key=f"duty_{d}", placeholder="当番")
 
     with c3:
-        st.text_area("", key=f"sch_{d}", placeholder="予定", height=60)
+        st.text_area("", key=f"sch_{d}", placeholder="予定", height=50)
 
 colL, colR = st.columns(2)
 with colL:
