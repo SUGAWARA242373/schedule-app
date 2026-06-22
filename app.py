@@ -131,6 +131,8 @@ members = ["菅原","阿部","澤","畠山","猿田","谷川","村手","武藤",
 
 start = st.sidebar.selectbox("開始当番（1日）", members)
 
+import jpholiday  # ← 忘れずに
+
 if st.sidebar.button("当番自動割当"):
     idx = members.index(start)
 
