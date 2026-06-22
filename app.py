@@ -135,9 +135,18 @@ if st.sidebar.button("当番自動割当"):
     idx = members.index(start)
 
     for d in range(1, days+1):
-        val = members[(idx+d-1) % len(members)]
+        date = datetime.date(year, month, d)
+
+        # 土日 or 祝日はスキップ
+        if date.weekday() >= 5 or jpholiday.is_holiday(date):
+            st.session_state.duty[d] = ""
+            st.session_state[f"duty_{d}"] = ""
+            continue
+
+        val = members[idx % len(members)]
         st.session_state.duty[d] = val
         st.session_state[f"duty_{d}"] = val
+        idx += 1
 
     st.rerun()
 
