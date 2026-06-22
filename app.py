@@ -176,22 +176,31 @@ st.sidebar.button("全削除（この月）", on_click=clear_all)
 def draw_day(d):
     k = str(d)
     c1, c2, c3 = st.columns([0.6, 1.8, 7])
+
     with c1:
         st.write(d)
+
     with c2:
-        st.session_state.data["duty"][k] = st.text_input(
+        val = st.text_input(
             "",
-            st.session_state.data["duty"][k],
+            value=st.session_state.data["duty"][k],
             key=f"duty_{d}",
             label_visibility="collapsed"
         )
+        # ★ 手入力があった時だけ反映
+        if val != st.session_state.data["duty"][k]:
+            st.session_state.data["duty"][k] = val
+
     with c3:
-        st.session_state.data["schedule"][k] = st.text_input(
+        val = st.text_input(
             "",
-            st.session_state.data["schedule"][k],
+            value=st.session_state.data["schedule"][k],
             key=f"sch_{d}",
             label_visibility="collapsed"
         )
+        # ★ 手入力があった時だけ反映
+        if val != st.session_state.data["schedule"][k]:
+            st.session_state.data["schedule"][k] = val
 
 left, right = st.columns(2)
 with left:
