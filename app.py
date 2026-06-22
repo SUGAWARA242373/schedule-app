@@ -12,7 +12,7 @@ import jpholiday
 st.set_page_config(layout="wide")
 
 # =========================
-# 年月入力（唯一）
+# 年月入力（ここが唯一）
 # =========================
 year = st.number_input("年", value=2026, key="year")
 month = st.number_input("月", 1, 12, 6, key="month")
@@ -22,7 +22,7 @@ today = datetime.date.today()
 data_file = f"data_{year}_{month}.json"
 
 # =========================
-# タイトル
+# タイトル・年月（大表示）
 # =========================
 st.markdown(
     f"""
@@ -35,8 +35,9 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 # =========================
-# CSS
+# CSS（1回だけ）
 # =========================
 st.markdown("""
 <style>
@@ -56,7 +57,7 @@ textarea {
 """, unsafe_allow_html=True)
 
 # =========================
-# 初期化（widget state のみ）
+# widget state 初期化（唯一のデータ）
 # =========================
 for d in range(1, days + 1):
     st.session_state.setdefault(f"duty_{d}", "")
@@ -95,9 +96,9 @@ if st.sidebar.button("当番自動割当（平日のみ）"):
         date = datetime.date(year, month, d)
         if date.weekday() >= 5 or jpholiday.is_holiday(date):
             st.session_state[f"duty_{d}"] = ""
-            continue
-        st.session_state[f"duty_{d}"] = members[idx % len(members)]
-        idx += 1
+        else:
+            st.session_state[f"duty_{d}"] = members[idx % len(members)]
+            idx += 1
     st.rerun()
 
 if st.sidebar.button("全クリア"):
@@ -118,7 +119,7 @@ def get_color(d):
     return "black"
 
 # =========================
-# 表示
+# 表示（保存処理なし）
 # =========================
 def draw(d):
     c1, c2, c3 = st.columns([1, 1.5, 6])
@@ -167,9 +168,8 @@ if uploaded:
     st.rerun()
 
 # =========================
-# 自動保存（widget state をそのまま保存）
+# 自動保存（widget stateのみ）
 # =========================
 save_data = {k: v for k, v in st.session_state.items() if k.startswith("duty_") or k.startswith("sch_")}
 with open(data_file, "w", encoding="utf-8") as f:
-    json.dump(save_data, f, ensure_ascii=False, indent=2)        indent=2
-    )
+    json.dump(save_data, f, ensure_ascii=False, indent=2)
