@@ -186,7 +186,6 @@ def draw(d):
             height=60
         )
 
-    st.session_state.schedule[d] = val
 
 
 
