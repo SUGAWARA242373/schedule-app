@@ -12,10 +12,10 @@ import os
 
 
 # ✅ CSS（入力欄用）
+
 st.set_page_config(layout="wide")
-st.title("品質管理チーム月間スケジュール表")
 
-
+# ===== タイトル（大）=====
 st.markdown(
     f"""
     <div style="
@@ -36,12 +36,16 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# ===== CSS（1回だけ）=====
+st.markdown("""
+<style>
+div[data-testid="stVerticalBlock"] {
+    gap: 0.02rem !important;
+}
+
 div[data-testid="stTextInput"] input {
     height: 50px !important;
-    padding-top: 1px !important;
-    padding-bottom: 2px !important;
-    padding-left: 6px !important;
-    padding-right: 6px !important;
+    padding: 2px 6px !important;
     line-height: 1.1 !important;
     font-size: 22px !important;
     text-align: center !important;
@@ -50,10 +54,7 @@ div[data-testid="stTextInput"] input {
 
 textarea {
     min-height: 50px !important;
-    padding-top: 2px !important;
-    padding-bottom: 2px !important;
-    padding-left: 6px !important;
-    padding-right: 6px !important;
+    padding: 2px 6px !important;
     line-height: 1.1 !important;
     font-size: 16px !important;
     box-sizing: border-box !important;
