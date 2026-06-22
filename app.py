@@ -17,8 +17,17 @@ st.set_page_config(layout="wide")
 st.title("品質管理チーム月間スケジュール表")
 
 
-st.markdown("""
-<style>
+st.markdown(
+    f"""
+    <div style="font-size:42px;font-weight:700;">
+        品質管理チーム月間スケジュール表
+    </div>
+    <div style="font-size:34px;font-weight:600;margin-bottom:20px;">
+        {year}年 {month}月
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 
 /* 行と行の間（全体） */
