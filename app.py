@@ -6,17 +6,17 @@ import json
 import os
 
 
-st.markdown(
+
     f"""
     <div style="
-        font-size:40px;
+        font-size:42px;
         font-weight:700;
-        margin-bottom:5px;
+        margin-bottom:6px;
     ">
-        品質管理チーム 月間スケジュール表
+        品質管理チーム月間スケジュール表
     </div>
     <div style="
-        font-size:32px;
+        font-size:34px;
         font-weight:600;
         margin-bottom:20px;
     ">
@@ -25,6 +25,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 
 
 st.markdown("""
