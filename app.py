@@ -78,7 +78,7 @@ if os.path.exists(data_file) and not st.session_state.get("loaded", False):
 # =========================
 st.sidebar.header("操作")
 
-# 日付選択（← ご要望どおり左の操作欄）
+# 日付選択（左の操作欄）
 day_sel = st.sidebar.number_input(
     "日付",
     1,
