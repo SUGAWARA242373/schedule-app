@@ -67,6 +67,23 @@ if st.button("CSV保存"):
 
 
 # =========================
+# CSV読込（安全版）
+# =========================
+uploaded = st.file_uploader("CSV読込", type="csv")
+
+if uploaded:
+    df_in = pd.read_csv(uploaded)
+
+    for _, row in df_in.iterrows():
+        d = int(row["日"])
+        if 1 <= d <= days:
+            st.session_state[f"duty_{d}"] = "" if pd.isna(row["当番"]) else str(row["当番"])
+            st.session_state[f"sch_{d}"] = "" if pd.isna(row["予定"]) else str(row["予定"])
+
+    st.success("CSVを読み込みました")
+    st.rerun()
+
+# =========================
 # CSV保存・読込
 # =========================
 if st.button("CSV保存"):
