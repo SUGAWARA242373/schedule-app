@@ -13,6 +13,9 @@ import os
 
 # ✅ CSS（入力欄用）
 
+Ｙear = st.number_input("年", value=2026)
+month = st.number_input("月", 1, 12, 6)
+
 
 st.set_page_config(layout="wide")
 
