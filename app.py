@@ -8,20 +8,34 @@ import os
 
 
   
+
 st.set_page_config(layout="wide")
 
-# ✅ タイトル・年月（大）
+# ✅ ① 年月入力を先に定義
+year = st.number_input("年", value=2026)
+month = st.number_input("月", 1, 12, 6)
+
+# ✅ ② タイトル・年月を描画（後）
 st.markdown(
     f"""
-    <div style="font-size:42px;font-weight:700;">
+    <div style="
+        font-size:42px;
+        font-weight:700;
+        margin-bottom:6px;
+    ">
         品質管理チーム月間スケジュール表
     </div>
-    <div style="font-size:34px;font-weight:600;margin-bottom:20px;">
+    <div style="
+        font-size:34px;
+        font-weight:600;
+        margin-bottom:20px;
+    ">
         {year}年 {month}月
     </div>
     """,
     unsafe_allow_html=True
 )
+
 
 # ✅ CSS（入力欄用）
 st.markdown("""
