@@ -149,6 +149,13 @@ def get_color(d):
 # =========================
 # 表示
 # =========================
+
+def update_duty(d):
+    st.session_state.duty[d] = st.session_state[f"duty_{d}"]
+
+def update_schedule(d):
+    st.session_state.schedule[d] = st.session_state[f"sch_{d}"]
+
 def draw(d):
     c1, c2, c3 = st.columns([1, 1.5, 6])
 
@@ -161,18 +168,24 @@ def draw(d):
         )
 
     with c2:
-        st.text_input("", key=f"duty_{d}", placeholder="当番")
+        st.text_input(
+            "",
+            key=f"duty_{d}",
+            placeholder="当番",
+            on_change=update_duty,
+            args=(d,)
+        )
 
     with c3:
-        st.text_area("", key=f"sch_{d}", placeholder="予定", height=60)
+        st.text_area(
+            "",
+            key=f"sch_{d}",
+            placeholder="予定",
+            height=60,
+            on_change=update_schedule,
+            args=(d,)
+        )
 
-colL, colR = st.columns(2)
-with colL:
-    for d in range(1, min(16, days + 1)):
-        draw(d)
-with colR:
-    for d in range(16, days + 1):
-        draw(d)
 
 # =========================
 # CSV保存・読込
