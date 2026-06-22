@@ -12,27 +12,26 @@ import os
 
 
 # ✅ CSS（入力欄用）
-st.markdown("""
-<style>
-div[data-testid="stVerticalBlock"] {
-    gap: 0.02rem !important;
-}
-div[data-testid="stTextInput"] input {
-    height: 50px !important;
-    font-size: 22px !important;
-}
-textarea {
-    min-height: 50px !important;
-    font-size: 16px !important;
-}
-</style>
-""", unsafe_allow_html=True)
 
+st.set_page_config(layout="wide")
 
+# 年月入力（★key付き）
+year = st.number_input("年", value=2026, key="year_input")
+month = st.number_input("月", 1, 12, 6, key="month_input")
 
+# タイトル・年月表示（大）
+st.markdown(
+    f"""
+    <div style="font-size:42px;font-weight:700;">
+        品質管理チーム月間スケジュール表
+    </div>
+    <div style="font-size:34px;font-weight:600;margin-bottom:20px;">
+        {year}年 {month}月
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
-st.markdown("""
-<style>
 
 /* 行と行の間（全体） */
 div[data-testid="stVerticalBlock"] {
