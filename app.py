@@ -67,7 +67,15 @@ temp = st.sidebar.selectbox(
     key="template_select"
 )
 
-day_sel = st.sidebar.number_input("日付", 1, days, 1)
+
+day_sel = st.sidebar.number_input(
+    "日付",
+    1,
+    days,
+    1,
+    key="day_select"
+)
+
 
 import streamlit as st
 import pandas as pd
