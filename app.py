@@ -35,6 +35,16 @@ st.markdown(
 )
 
 # =========================
+# 年月入力（ここが唯一）
+# =========================
+year = st.number_input("年", value=2026, key="year_input")
+month = st.number_input("月", 1, 12, 6, key="month_input")
+
+days = calendar.monthrange(year, month)[1]
+today = datetime.date.today()
+data_file = f"data_{year}_{month}.json"
+
+# =========================
 # CSS（1回だけ・コメント無し）
 # =========================
 st.markdown("""
