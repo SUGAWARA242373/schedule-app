@@ -56,21 +56,6 @@ if os.path.exists(data_file) and not st.session_state.get("loaded", False):
             st.session_state[k] = v
     st.session_state.loaded = True
 
-temp = st.sidebar.selectbox(
-    "予定テンプレ",
-    templates,
-    key="template_select"
-)
-
-day_sel = st.sidebar.number_input(
-    "日付",
-    1,
-    days,
-    1,
-    key="day_select"
-)
-
-
 import streamlit as st
 import pandas as pd
 import calendar
@@ -126,10 +111,12 @@ templates = ["", "うわかい", "外船", "チーム会議", "安全衛生委�
 temp = st.sidebar.selectbox("予定テンプレ", templates)
 day_sel = st.sidebar.number_input("日付", 1, days, 1)
 
+
 if st.sidebar.button("テンプレ入力") and temp:
     cur = st.session_state[f"sch_{day_sel}"]
-    st.session_state[f"sch_{day_sel}"] = temp if cur == "" else f"{cur} / {temp}"
-    st.rerun()
+    st.session_state[f"sch_{day_sel}"] = (
+        temp if cur == "" else f"{cur} / {temp}"
+    )
 
 members = ["菅原","阿部","澤","畠山","猿田","谷川","村手","武藤","小笠原","藤田"]
 start = st.sidebar.selectbox("開始当番（1日）", members)
