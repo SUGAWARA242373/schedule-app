@@ -6,9 +6,6 @@ import json
 import os
 import jpholiday
 
-# =========================
-# ページ設定
-# =========================
 st.set_page_config(layout="wide")
 
 # =========================
@@ -41,23 +38,18 @@ st.markdown(
 # =========================
 st.markdown("""
 <style>
-div[data-testid="stVerticalBlock"] {
-    gap: 0.02rem !important;
-}
+div[data-testid="stVerticalBlock"] { gap: 0.02rem !important; }
 div[data-testid="stTextInput"] input {
     height: 48px !important;
     font-size: 22px !important;
     text-align: center !important;
 }
-textarea {
-    min-height: 50px !important;
-    font-size: 16px !important;
-}
+textarea { min-height: 50px !important; font-size: 16px !important; }
 </style>
 """, unsafe_allow_html=True)
 
 # =========================
-# widget state 初期化（唯一のデータ）
+# widget state 初期化
 # =========================
 for d in range(1, days + 1):
     st.session_state.setdefault(f"duty_{d}", "")
@@ -78,7 +70,6 @@ if os.path.exists(data_file) and not st.session_state.get("loaded", False):
 # =========================
 st.sidebar.header("操作")
 
-# 日付選択（左の操作欄）
 day_sel = st.sidebar.number_input(
     "日付",
     1,
@@ -87,7 +78,6 @@ day_sel = st.sidebar.number_input(
     key="day_select"
 )
 
-# テンプレ
 templates = ["", "うわかい", "外船", "チーム会議", "安全衛生委員会", "在庫調査日"]
 temp = st.sidebar.selectbox(
     "予定テンプレ",
@@ -97,11 +87,8 @@ temp = st.sidebar.selectbox(
 
 if st.sidebar.button("テンプレ入力") and temp:
     cur = st.session_state[f"sch_{day_sel}"]
-    st.session_state[f"sch_{day_sel}"] = (
-        temp if cur == "" else f"{cur} / {temp}"
-    )
+    st.session_state[f"sch_{day_sel}"] = temp if cur == "" else f"{cur} / {temp}"
 
-# 当番自動割当
 members = ["菅原","阿部","澤","畠山","猿田","谷川","村手","武藤","小笠原","藤田"]
 start = st.sidebar.selectbox(
     "開始当番（1日）",
@@ -125,32 +112,22 @@ if st.sidebar.button("全クリア"):
         st.session_state[f"sch_{d}"] = ""
 
 # =========================
-# 曜日色
+# 表示
 # =========================
 def get_color(d):
     wd = datetime.date(year, month, d).weekday()
-    if wd == 5:
-        return "blue"
-    if wd == 6:
-        return "red"
-    return "black"
+    return "blue" if wd == 5 else "red" if wd == 6 else "black"
 
-# =========================
-# 表示
-# =========================
 def draw(d):
     c1, c2, c3 = st.columns([1, 2, 6])
-
     with c1:
         mark = "★" if datetime.date(year, month, d) == today else ""
         st.markdown(
             f"<div style='color:{get_color(d)};font-size:22px'>{d}{mark}</div>",
             unsafe_allow_html=True
         )
-
     with c2:
         st.text_input("", key=f"duty_{d}", placeholder="当番")
-
     with c3:
         st.text_area("", key=f"sch_{d}", placeholder="予定", height=50)
 
@@ -179,33 +156,20 @@ if st.button("CSV保存"):
         "text/csv"
     )
 
-
 # =========================
-# CSV読込（Streamlit安全版）
+# CSV読込（★ここが決定版）
 # =========================
-uploaded = st.file_uploader("CSV読込", type="csv")
+with st.form("csv_import_form"):
+    uploaded = st.file_uploader("CSV読込", type="csv")
+    submitted = st.form_submit_button("CSVを反映")
 
-# ① CSVを読み込んだ瞬間：一時バッファに退避
-if uploaded is not None and "csv_buffer" not in st.session_state:
-    st.session_state["csv_buffer"] = pd.read_csv(uploaded)
-    st.session_state["csv_apply"] = True
-    st.rerun()
-
-# ② rerun後：widget生成前に state を反映
-if st.session_state.get("csv_apply", False):
-    df_in = st.session_state.pop("csv_buffer")
-    st.session_state.pop("csv_apply", None)
-
+if submitted and uploaded is not None:
+    df_in = pd.read_csv(uploaded)
     for _, row in df_in.iterrows():
         d = int(row["日"])
         if 1 <= d <= days:
-            st.session_state[f"duty_{d}"] = (
-                "" if pd.isna(row["当番"]) else str(row["当番"])
-            )
-            st.session_state[f"sch_{d}"] = (
-                "" if pd.isna(row["予定"]) else str(row["予定"])
-            )
-
+            st.session_state[f"duty_{d}"] = "" if pd.isna(row["当番"]) else str(row["当番"])
+            st.session_state[f"sch_{d}"] = "" if pd.isna(row["予定"]) else str(row["予定"])
     st.success("CSVを読み込みました")
 
 # =========================
