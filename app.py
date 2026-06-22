@@ -12,17 +12,17 @@ import jpholiday
 st.set_page_config(layout="wide")
 
 # =========================
-# 年月入力（ここが唯一）
+# 年月入力（唯一）
 # =========================
-year = st.number_input("年", value=2026, key="year_input")
-month = st.number_input("月", 1, 12, 6, key="month_input")
+year = st.number_input("年", value=2026, key="year")
+month = st.number_input("月", 1, 12, 6, key="month")
 
 days = calendar.monthrange(year, month)[1]
 today = datetime.date.today()
 data_file = f"data_{year}_{month}.json"
 
 # =========================
-# タイトル・年月（大表示）
+# タイトル
 # =========================
 st.markdown(
     f"""
@@ -37,7 +37,7 @@ st.markdown(
 )
 
 # =========================
-# CSS（1回だけ）
+# CSS
 # =========================
 st.markdown("""
 <style>
@@ -45,7 +45,7 @@ div[data-testid="stVerticalBlock"] {
     gap: 0.02rem !important;
 }
 div[data-testid="stTextInput"] input {
-    height: 50px !important;
+    height: 48px !important;
     font-size: 22px !important;
     text-align: center !important;
 }
@@ -57,43 +57,21 @@ textarea {
 """, unsafe_allow_html=True)
 
 # =========================
-# データ初期化
+# 初期化（widget state のみ）
 # =========================
-if "schedule" not in st.session_state:
-    st.session_state.schedule = {}
-if "duty" not in st.session_state:
-    st.session_state.duty = {}
-
 for d in range(1, days + 1):
-    st.session_state.schedule.setdefault(d, "")
-    st.session_state.duty.setdefault(d, "")
-    st.session_state.setdefault(f"sch_{d}", "")
     st.session_state.setdefault(f"duty_{d}", "")
+    st.session_state.setdefault(f"sch_{d}", "")
 
 # =========================
-# データロード（初回のみ）
+# JSONロード（初回のみ）
 # =========================
 if os.path.exists(data_file) and not st.session_state.get("loaded", False):
     with open(data_file, "r", encoding="utf-8") as f:
         data = json.load(f)
-        for k, v in data.get("schedule", {}).items():
-            d = int(k)
-            st.session_state.schedule[d] = v
-            st.session_state[f"sch_{d}"] = v
-        for k, v in data.get("duty", {}).items():
-            d = int(k)
-            st.session_state.duty[d] = v
-            st.session_state[f"duty_{d}"] = v
+        for k, v in data.items():
+            st.session_state[k] = v
     st.session_state.loaded = True
-
-# =========================
-# 保存用コールバック（★重要）
-# =========================
-def update_duty(d):
-    st.session_state.duty[d] = st.session_state[f"duty_{d}"]
-
-def update_schedule(d):
-    st.session_state.schedule[d] = st.session_state[f"sch_{d}"]
 
 # =========================
 # サイドバー操作
@@ -105,10 +83,8 @@ temp = st.sidebar.selectbox("予定テンプレ", templates)
 day_sel = st.sidebar.number_input("日付", 1, days, 1)
 
 if st.sidebar.button("テンプレ入力") and temp:
-    cur = st.session_state.schedule[day_sel]
-    val = temp if cur == "" else f"{cur} / {temp}"
-    st.session_state.schedule[day_sel] = val
-    st.session_state[f"sch_{day_sel}"] = val
+    cur = st.session_state[f"sch_{day_sel}"]
+    st.session_state[f"sch_{day_sel}"] = temp if cur == "" else f"{cur} / {temp}"
     st.rerun()
 
 members = ["菅原","阿部","澤","畠山","猿田","谷川","村手","武藤","小笠原","藤田"]
@@ -119,21 +95,16 @@ if st.sidebar.button("当番自動割当（平日のみ）"):
     for d in range(1, days + 1):
         date = datetime.date(year, month, d)
         if date.weekday() >= 5 or jpholiday.is_holiday(date):
-            st.session_state.duty[d] = ""
             st.session_state[f"duty_{d}"] = ""
             continue
-        val = members[idx % len(members)]
-        st.session_state.duty[d] = val
-        st.session_state[f"duty_{d}"] = val
+        st.session_state[f"duty_{d}"] = members[idx % len(members)]
         idx += 1
     st.rerun()
 
 if st.sidebar.button("全クリア"):
     for d in range(1, days + 1):
-        st.session_state.schedule[d] = ""
-        st.session_state.duty[d] = ""
-        st.session_state[f"sch_{d}"] = ""
         st.session_state[f"duty_{d}"] = ""
+        st.session_state[f"sch_{d}"] = ""
     st.rerun()
 
 # =========================
@@ -148,37 +119,23 @@ def get_color(d):
     return "black"
 
 # =========================
-# 表示（★保存しない）
+# 表示
 # =========================
 def draw(d):
     c1, c2, c3 = st.columns([1, 1.5, 6])
 
     with c1:
-        color = get_color(d)
         mark = "★" if datetime.date(year, month, d) == today else ""
         st.markdown(
-            f"<div style='color:{color};font-size:22px'>{d}{mark}</div>",
+            f"<div style='color:{get_color(d)};font-size:22px'>{d}{mark}</div>",
             unsafe_allow_html=True
         )
 
     with c2:
-        st.text_input(
-            "",
-            key=f"duty_{d}",
-            placeholder="当番",
-            on_change=update_duty,
-            args=(d,)
-        )
+        st.text_input("", key=f"duty_{d}", placeholder="当番")
 
     with c3:
-        st.text_area(
-            "",
-            key=f"sch_{d}",
-            placeholder="予定",
-            height=60,
-            on_change=update_schedule,
-            args=(d,)
-        )
+        st.text_area("", key=f"sch_{d}", placeholder="予定", height=60)
 
 colL, colR = st.columns(2)
 with colL:
@@ -194,8 +151,8 @@ with colR:
 if st.button("CSV保存"):
     df = pd.DataFrame({
         "日": list(range(1, days + 1)),
-        "当番": [st.session_state.duty[d] for d in range(1, days + 1)],
-        "予定": [st.session_state.schedule[d] for d in range(1, days + 1)]
+        "当番": [st.session_state[f"duty_{d}"] for d in range(1, days + 1)],
+        "予定": [st.session_state[f"sch_{d}"] for d in range(1, days + 1)],
     })
     csv = df.to_csv(index=False).encode("utf-8-sig")
     st.download_button("CSVダウンロード", csv, f"schedule_{year}_{month}.csv", "text/csv")
@@ -206,22 +163,14 @@ if uploaded:
     for _, row in df_in.iterrows():
         d = int(row["日"])
         if 1 <= d <= days:
-            duty_val = "" if pd.isna(row["当番"]) else str(row["当番"])
-            sch_val = "" if pd.isna(row["予定"]) else str(row["予定"])
-            st.session_state.duty[d] = duty_val
-            st.session_state.schedule[d] = sch_val
-            st.session_state[f"duty_{d}"] = duty_val
-            st.session_state[f"sch_{d}"] = sch_val
-    st.success("CSVを読み込みました")
+            st.session_state[f"duty_{d}"] = "" if pd.isna(row["当番"]) else str(row["当番"])
+            st.session_state[f"sch_{d}"] = "" if pd.isna(row["予定"]) else str(row["予定"])
     st.rerun()
 
 # =========================
-# 自動保存
+# 自動保存（widget state をそのまま保存）
 # =========================
+save_data = {k: v for k, v in st.session_state.items() if k.startswith("duty_") or k.startswith("sch_")}
 with open(data_file, "w", encoding="utf-8") as f:
-    json.dump(
-        {"schedule": st.session_state.schedule, "duty": st.session_state.duty},
-        f,
-        ensure_ascii=False,
-        indent=2
+    json.dump(save_data, f, ensure_ascii=False, indent=2)        indent=2
     )
