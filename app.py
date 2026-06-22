@@ -155,23 +155,27 @@ def get_color(d):
 # =========================
 # 表示
 # =========================
-def draw(d):
+
+    # UI → data 同期
+    st.session_state.schedule[d] = st.session_state.get(f"sch_{d}", "")
+    st.session_state.duty[d] = st.session_state.get(f"duty_{d}", "")
+
     c1, c2, c3 = st.columns([1,1.5,6])
 
     with c1:
         color = get_color(d)
         today_mark = "★" if datetime.date(year, month, d) == today else ""
-        st.markdown(f"<div style='color:{color}; font-size:22px'>{d}{today_mark}</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div style='color:{color}; font-size:22px'>{d}{today_mark}</div>",
+            unsafe_allow_html=True
+        )
 
     with c2:
-        val = st.text_input("", key=f"duty_{d}", placeholder="当番")
-        st.session_state.duty[d] = val
+        st.text_input("", key=f"duty_{d}", placeholder="当番")
+
     with c3:
-        val = st.text_area(
-        "",
-        key=f"sch_{d}",
-        placeholder="予定",
-        height=60
+        st.text_area("", key=f"sch_{d}", placeholder="予定", height=60)
+
     )
     st.session_state.schedule[d] = val
 
