@@ -177,10 +177,21 @@ def draw(d):
     with c1:
         color = get_color(d)
         today_mark = "★" if datetime.date(year, month, d) == today else ""
-        st.markdown(
-            f"<div style='color:{color}; font-size:22px'>{d}{today_mark}</div>",
-            unsafe_allow_html=True
-        )
+      
+st.markdown(
+    f"""
+    <div style="
+        font-size:36px;
+        font-weight:700;
+        margin-top:10px;
+        margin-bottom:20px;
+    ">
+        {year}年 {month}月
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 
     with c2:
         st.text_input(
