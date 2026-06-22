@@ -13,6 +13,7 @@ import os
 
 # ✅ CSS（入力欄用）
 
+
 st.set_page_config(layout="wide")
 
 # 年月入力（★key付き）
@@ -32,6 +33,8 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+st.markdown("""
+<style>
 
 /* 行と行の間（全体） */
 div[data-testid="stVerticalBlock"] {
