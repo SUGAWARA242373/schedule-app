@@ -5,8 +5,26 @@ import datetime
 import json
 import os
 
-st.set_page_config(layout="wide")
-st.title("品質管理チーム月間スケジュール表")
+
+st.markdown(
+    f"""
+    <div style="
+        font-size:40px;
+        font-weight:700;
+        margin-bottom:5px;
+    ">
+        品質管理チーム 月間スケジュール表
+    </div>
+    <div style="
+        font-size:32px;
+        font-weight:600;
+        margin-bottom:20px;
+    ">
+        {year}年 {month}月
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 
 st.markdown("""
