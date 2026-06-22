@@ -16,9 +16,7 @@ st.markdown("""
 input::placeholder { font-size:11px; color:#999; }
 input { font-size:13px; }
 
-.block-container {
-    padding-top: 1rem;
-}
+.block-container { padding-top: 1rem; }
 
 .scroll-area {
     height:45vh;
@@ -74,7 +72,7 @@ if os.path.exists(data_file) and not st.session_state.loaded:
         st.session_state.data = json.load(f)
     st.session_state.loaded = True
 
-# --- month 補完（KeyError防止） ---
+# --- month 補完 ---
 st.session_state.data.setdefault("month", {})
 st.session_state.data["month"].setdefault("start", "")
 st.session_state.data["month"].setdefault("container", [])
@@ -96,7 +94,7 @@ st.markdown(
 )
 
 # =================================================
-# 月次当番（固定）
+# 月次当番（固定表示）
 # =================================================
 ms = st.session_state.data["month"]
 
@@ -120,30 +118,26 @@ members = ["菅原","阿部","澤","畠山","猿田","谷川","村手","武藤",
 
 st.sidebar.header("操作・月次設定")
 
-# --- テンプレ ---
+# --- テンプレ入力 ---
 templates = {
     "外船":"外船",
     "チーム会議":"チーム会議",
     "安全衛生委員会":"安全衛生委員会"
 }
 
-temp = st.sidebar.selectbox("予定テンプレ", [""] + list(templates))
+temp = st.sidebar.selectbox("予定テンプレ", [""] + list(templates.keys()))
 day_sel = st.sidebar.number_input("日付", 1, days, 1)
-
 
 if st.sidebar.button("テンプレ入力"):
     if temp == "":
-        st.warning("テンプレを選択してください")
+        st.sidebar.warning("テンプレを選択してください")
     else:
         d = str(day_sel)
         cur = st.session_state.data["schedule"].get(d, "")
         new = templates[temp]
-        st.session_state.data["schedule"][d] = (
-            new if cur == "" else f"{cur} / {new}"
-        )
+        st.session_state.data["schedule"][d] = new if cur == "" else f"{cur} / {new}"
         st.session_state.pop(f"sch_{day_sel}", None)
         st.rerun()
-
 
 # --- 当番自動割当 ---
 start = st.sidebar.selectbox("開始当番（1日）", members)
@@ -161,13 +155,17 @@ if st.sidebar.button("当番自動割当（土日祝除外）"):
 
 # --- 月次設定 ---
 st.sidebar.markdown("---")
-ms["start"] = st.sidebar.selectbox("開始当番メンバー", members, index=members.index(ms.get("start", members[0])))
+ms["start"] = st.sidebar.selectbox(
+    "開始当番メンバー",
+    members,
+    index=members.index(ms.get("start", members[0]))
+)
 ms["container"] = st.sidebar.multiselect("容器", members, max_selections=3, default=ms.get("container", []))
 ms["sample"] = st.sidebar.multiselect("サンプル", members, max_selections=3, default=ms.get("sample", []))
 ms["oil"] = st.sidebar.multiselect("灯油", members, max_selections=3, default=ms.get("oil", []))
 
 # =================================================
-# CSV操作
+# CSV 操作（★ 重複防止済）
 # =================================================
 st.sidebar.markdown("---")
 st.sidebar.markdown("### CSV")
@@ -184,9 +182,12 @@ st.sidebar.download_button(
     file_name=f"schedule_{year}_{month}.csv"
 )
 
-up = st.sidebar.file_uploader("CSV読込", type="csv")
+up = st.sidebar.file_uploader(
+    "CSV読込",
+    type="csv",
+    key="csv_upload"
+)
 
-up = st.sidebar.file_uploader("CSV読込", type="csv")
 if up:
     df = pd.read_csv(up)
     for _, r in df.iterrows():
@@ -221,11 +222,24 @@ def draw(d):
     k = str(d)
     a, b, c3 = st.columns([1,2,7])
     with a:
-        st.markdown(f"<div style='background:{bg};color:{c};padding:2px'>{d}</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div style='background:{bg};color:{c};padding:2px'>{d}</div>",
+            unsafe_allow_html=True
+        )
     with b:
-        st.session_state.data["duty"][k] = st.text_input("", st.session_state.data["duty"][k], key=f"duty_{d}", label_visibility="collapsed")
+        st.session_state.data["duty"][k] = st.text_input(
+            "",
+            st.session_state.data["duty"][k],
+            key=f"duty_{d}",
+            label_visibility="collapsed"
+        )
     with c3:
-        st.session_state.data["schedule"][k] = st.text_input("", st.session_state.data["schedule"][k], key=f"sch_{d}", label_visibility="collapsed")
+        st.session_state.data["schedule"][k] = st.text_input(
+            "",
+            st.session_state.data["schedule"][k],
+            key=f"sch_{d}",
+            label_visibility="collapsed"
+        )
 
 st.markdown("<div class='scroll-area'>", unsafe_allow_html=True)
 colL, colR = st.columns(2)
