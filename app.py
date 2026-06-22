@@ -66,13 +66,20 @@ if st.button("CSV保存"):
     )
 
 
-# =========================
-# CSV読込（安全版）
-# =========================
-uploaded = st.file_uploader("CSV読込", type="csv")
 
-if uploaded:
+ =========================
+uploaded = st.file_uploader("CSV読込", type="csv", key="csv_upload")
+
+if uploaded and "csv_loaded" not in st.session_state:
     df_in = pd.read_csv(uploaded)
+
+    st.session_state["_csv_buffer"] = df_in
+    st.session_state["csv_loaded"] = True
+    st.rerun()
+
+if st.session_state.get("csv_loaded", False):
+    df_in = st.session_state.pop("_csv_buffer")
+    st.session_state.pop("csv_loaded", None)
 
     for _, row in df_in.iterrows():
         d = int(row["日"])
@@ -82,6 +89,7 @@ if uploaded:
 
     st.success("CSVを読み込みました")
     st.rerun()
+
 
 # =========================
 # CSV保存・読込
