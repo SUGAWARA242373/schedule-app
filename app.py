@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 import calendar
 import datetime
 import json
@@ -7,16 +6,9 @@ import os
 import jpholiday
 
 # =========================
-# ページ設定 & CSS
+# ページ設定
 # =========================
 st.set_page_config(layout="wide")
-
-st.markdown("""
-<style>
-input::placeholder { font-size:11px; color:#999; }
-input { font-size:13px; }
-</style>
-""", unsafe_allow_html=True)
 
 DATA_DIR = "data"
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -24,15 +16,15 @@ os.makedirs(DATA_DIR, exist_ok=True)
 # =========================
 # 年月選択
 # =========================
-col_y, col_m = st.columns([2, 1])
-with col_y:
-    year = st.number_input("年", value=2026, step=1, key="year")
-with col_m:
-    month = st.number_input("月", 1, 12, 6, key="month")
+c1, c2 = st.columns([2, 1])
+with c1:
+    year = st.number_input("年", value=2026, step=1)
+with c2:
+    month = st.number_input("月", 1, 12, 6)
 
 days = calendar.monthrange(year, month)[1]
-data_file = f"{DATA_DIR}/data_{year}_{month}.json"
 today = datetime.date.today()
+data_file = f"{DATA_DIR}/data_{year}_{month}.json"
 
 # =========================
 # 月変更検知
@@ -52,8 +44,7 @@ if (
 # =========================
 st.session_state.setdefault("data", {
     "schedule": {},
-    "duty": {},
-    "month": {"start": "", "container": [], "sample": [], "oil": []}
+    "duty": {}
 })
 
 # =========================
@@ -79,46 +70,21 @@ st.markdown(
 )
 
 # =========================
-# 月次当番（表示）
+# コールバック関数（★必須）
 # =========================
-ms = st.session_state.data["month"]
+def update_schedule(day):
+    st.session_state.data["schedule"][day] = st.session_state[f"sch_{day}"]
 
-st.markdown("### 月次当番")
-st.markdown(
-    f"""
-    <div style="border:1px solid #ddd;padding:8px">
-    開始当番：<b>{ms["start"]}</b><br>
-    容器：{", ".join(ms["container"])}<br>
-    サンプル：{", ".join(ms["sample"])}<br>
-    灯油：{", ".join(ms["oil"])}
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-# =========================
-# コールバック関数
-# =========================
-members = ["菅原","阿部","澤","畠山","猿田","谷川","村手","武藤","小笠原","藤田"]
+def update_duty(day):
+    st.session_state.data["duty"][day] = st.session_state[f"duty_{day}"]
 
 def apply_template():
     d = str(st.session_state.day_sel)
     temp = st.session_state.temp_sel
     if temp == "":
         return
-    cur = st.session_state.data["schedule"][d]
-    st.session_state.data["schedule"][d] = temp if cur == "" else f"{cur} / {temp}"
+    st.session_state.data["schedule"][d] = temp
     st.session_state.pop(f"sch_{d}", None)
-
-def auto_assign():
-    idx = members.index(st.session_state.start_member)
-    for d in range(1, days + 1):
-        date = datetime.date(year, month, d)
-        if date.weekday() >= 5 or jpholiday.is_holiday(date):
-            continue
-        st.session_state.data["duty"][str(d)] = members[idx % len(members)]
-        st.session_state.pop(f"duty_{d}", None)
-        idx += 1
 
 def clear_all():
     for d in range(1, days + 1):
@@ -130,7 +96,7 @@ def clear_all():
 # =========================
 # サイドバー
 # =========================
-st.sidebar.header("操作・月次設定")
+st.sidebar.header("操作")
 
 st.sidebar.selectbox(
     "予定テンプレ",
@@ -145,28 +111,7 @@ st.sidebar.number_input(
 )
 
 st.sidebar.button("テンプレ入力", on_click=apply_template)
-
-st.sidebar.selectbox(
-    "開始当番（1日）",
-    members,
-    key="start_member"
-)
-
-st.sidebar.button("当番自動割当（土日祝除外）", on_click=auto_assign)
-
-st.sidebar.markdown("---")
-
-ms["start"] = st.sidebar.selectbox(
-    "開始当番メンバー",
-    members,
-    index=members.index(ms["start"]) if ms["start"] in members else 0
-)
-ms["container"] = st.sidebar.multiselect("容器", members, max_selections=3, default=ms["container"])
-ms["sample"] = st.sidebar.multiselect("サンプル", members, max_selections=3, default=ms["sample"])
-ms["oil"] = st.sidebar.multiselect("灯油", members, max_selections=3, default=ms["oil"])
-
-st.sidebar.markdown("---")
-st.sidebar.button("全削除（この月）", on_click=clear_all)
+st.sidebar.button("全削除", on_click=clear_all)
 
 # =========================
 # 日付スタイル
@@ -182,7 +127,7 @@ def day_style(d):
     return "white", "black"
 
 # =========================
-# 表（入力部）
+# 表示
 # =========================
 def draw_day(d):
     key = str(d)
@@ -216,8 +161,6 @@ def draw_day(d):
             on_change=update_schedule,
             args=(key,)
         )
-        if val != st.session_state.data["schedule"][key]:
-            st.session_state.data["schedule"][key] = val
 
 left, right = st.columns(2)
 with left:
