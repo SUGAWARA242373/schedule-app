@@ -1,177 +1,247 @@
 import streamlit as st
+import pandas as pd
 import calendar
 import datetime
 import json
 import os
-import jpholiday
 
-# =========================
-# ページ設定
-# =========================
 st.set_page_config(layout="wide")
+st.title("品質管理チーム月間スケジュール表")
 
-DATA_DIR = "data"
-os.makedirs(DATA_DIR, exist_ok=True)
+
+st.markdown("""
+<style>
+
+/* 行と行の間（全体） */
+div[data-testid="stVerticalBlock"] {
+    gap: 0.02rem !important;
+}
+
+/* 当番（text_input） */
+div[data-testid="stTextInput"] input {
+    height: 50px !important;
+    padding-top: 1px !important;
+    padding-bottom: 2px !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+    line-height: 1.1 !important;
+    font-size: 22px !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+}
+
+/* 予定（text_area） */
+textarea {
+    min-height: 50px !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+    line-height: 1.1 !important;
+    font-size: 16px !important;
+    box-sizing: border-box !important;
+}
+
+</style>
+""", unsafe_allow_html=True)
 
 # =========================
-# 年月選択
+# 月設定
 # =========================
-c1, c2 = st.columns([2, 1])
-with c1:
-    year = st.number_input("年", value=2026, step=1)
-with c2:
-    month = st.number_input("月", 1, 12, 6)
+year = st.number_input("年", value=2026)
+month = st.number_input("月", 1, 12, 6)
 
 days = calendar.monthrange(year, month)[1]
 today = datetime.date.today()
-data_file = f"{DATA_DIR}/data_{year}_{month}.json"
+
+data_file = f"data_{year}_{month}.json"
 
 # =========================
-# 月変更検知
+# 初期化（安全版）
 # =========================
-if (
-    "cur_year" not in st.session_state
-    or st.session_state.cur_year != year
-    or st.session_state.cur_month != month
-):
-    st.session_state.clear()
-    st.session_state.cur_year = year
-    st.session_state.cur_month = month
-    st.session_state.loaded = False
+if "schedule" not in st.session_state:
+    st.session_state.schedule = {}
+
+if "duty" not in st.session_state:
+    st.session_state.duty = {}
+
+# 日数分補完（KeyError防止）
+for d in range(1, days+1):
+    st.session_state.schedule.setdefault(d, "")
+    st.session_state.duty.setdefault(d, "")
 
 # =========================
-# データ（唯一の正）
+# UIキー初期化（超重要）
 # =========================
-st.session_state.setdefault("data", {
-    "schedule": {},
-    "duty": {}
-})
+for d in range(1, days+1):
+    st.session_state.setdefault(f"duty_{d}", st.session_state.duty.get(d, ""))
+    st.session_state.setdefault(f"sch_{d}", st.session_state.schedule.get(d, ""))
 
 # =========================
-# データロード
+# 初回ロード
 # =========================
-if os.path.exists(data_file) and not st.session_state.loaded:
+if os.path.exists(data_file) and "loaded" not in st.session_state:
     with open(data_file, "r", encoding="utf-8") as f:
-        st.session_state.data = json.load(f)
+        data = json.load(f)
+
+        for k, v in data.get("schedule", {}).items():
+            d = int(k)
+            st.session_state.schedule[d] = v
+            st.session_state[f"sch_{d}"] = v
+
+        for k, v in data.get("duty", {}).items():
+            d = int(k)
+            st.session_state.duty[d] = v
+            st.session_state[f"duty_{d}"] = v
+
     st.session_state.loaded = True
 
-# 補完
-for d in range(1, days + 1):
-    st.session_state.data["schedule"].setdefault(str(d), "")
-    st.session_state.data["duty"].setdefault(str(d), "")
-
 # =========================
-# タイトル
-# =========================
-st.markdown(
-    f"<h1>品質管理チーム 月間スケジュール</h1>"
-    f"<h2>{year}年 {month}月</h2>",
-    unsafe_allow_html=True
-)
-
-# =========================
-# コールバック関数（★必須）
-# =========================
-def update_schedule(day):
-    st.session_state.data["schedule"][day] = st.session_state[f"sch_{day}"]
-
-def update_duty(day):
-    st.session_state.data["duty"][day] = st.session_state[f"duty_{day}"]
-
-def apply_template():
-    d = str(st.session_state.day_sel)
-    temp = st.session_state.temp_sel
-    if temp == "":
-        return
-    st.session_state.data["schedule"][d] = temp
-    st.session_state.pop(f"sch_{d}", None)
-
-def clear_all():
-    for d in range(1, days + 1):
-        st.session_state.data["schedule"][str(d)] = ""
-        st.session_state.data["duty"][str(d)] = ""
-        st.session_state.pop(f"sch_{d}", None)
-        st.session_state.pop(f"duty_{d}", None)
-
-# =========================
-# サイドバー
+# サイドバー：テンプレ
 # =========================
 st.sidebar.header("操作")
 
-st.sidebar.selectbox(
-    "予定テンプレ",
-    ["", "チーム会議", "外船", "安全衛生委員会"],
-    key="temp_sel"
-)
+templates = {
+    "うわかい": "うわかい",
+    "外船": "外船",
+    "チーム会議": "チーム会議",
+    "安全衛生委員会": "安全衛生委員会",
+    "在庫調査日": "在庫調査日"
+}
 
-st.sidebar.number_input(
-    "日付",
-    1, days, 1,
-    key="day_sel"
-)
+temp = st.sidebar.selectbox("予定テンプレ", [""] + list(templates.keys()))
+day_sel = st.sidebar.number_input("日付", 1, days, 1)
 
-st.sidebar.button("テンプレ入力", on_click=apply_template)
-st.sidebar.button("全削除", on_click=clear_all)
+if st.sidebar.button("テンプレ入力"):
+    if temp:
+        if st.session_state.schedule[day_sel] == "":
+            val = templates[temp]
+        else:
+            val = st.session_state.schedule[day_sel] + " / " + templates[temp]
+
+        st.session_state.schedule[day_sel] = val
+        st.session_state[f"sch_{day_sel}"] = val
+
+    st.rerun()
 
 # =========================
-# 日付スタイル
+# 当番自動ローテ
 # =========================
-def day_style(d):
-    date = datetime.date(year, month, d)
-    if jpholiday.is_holiday(date):
-        return "#ffe5e5", "red"
-    if date.weekday() == 5:
-        return "#e8f0ff", "blue"
-    if date.weekday() == 6:
-        return "#ffe5e5", "red"
-    return "white", "black"
+members = ["菅原","阿部","澤","畠山","猿田","谷川","村手","武藤","小笠原","藤田"]
+
+start = st.sidebar.selectbox("開始当番（1日）", members)
+
+if st.sidebar.button("当番自動割当"):
+    idx = members.index(start)
+
+    for d in range(1, days+1):
+        val = members[(idx+d-1) % len(members)]
+        st.session_state.duty[d] = val
+        st.session_state[f"duty_{d}"] = val
+
+    st.rerun()
+
+# =========================
+# 曜日色
+# =========================
+def get_color(d):
+    wd = datetime.date(year, month, d).weekday()
+    if wd == 5:
+        return "blue"
+    if wd == 6:
+        return "red"
+    return "black"
 
 # =========================
 # 表示
 # =========================
-def draw_day(d):
-    key = str(d)
-    bg, color = day_style(d)
-    mark = "★" if datetime.date(year, month, d) == today else ""
-
-    c1, c2, c3 = st.columns([0.6, 1.8, 7])
+def draw(d):
+    c1, c2, c3 = st.columns([1,1.5,6])
 
     with c1:
-        st.markdown(
-            f"<div style='background:{bg};color:{color};padding:2px'>{d}{mark}</div>",
-            unsafe_allow_html=True
-        )
+        color = get_color(d)
+        today_mark = "★" if datetime.date(year, month, d) == today else ""
+        st.markdown(f"<div style='color:{color}; font-size:22px'>{d}{today_mark}</div>", unsafe_allow_html=True)
 
     with c2:
-        st.text_input(
-            "",
-            value=st.session_state.data["duty"][key],
-            key=f"duty_{d}",
-            label_visibility="collapsed",
-            on_change=update_duty,
-            args=(key,)
-        )
-
+        val = st.text_input("", key=f"duty_{d}", placeholder="当番")
+        st.session_state.duty[d] = val
     with c3:
-        st.text_input(
-            "",
-            value=st.session_state.data["schedule"][key],
-            key=f"sch_{d}",
-            label_visibility="collapsed",
-            on_change=update_schedule,
-            args=(key,)
-        )
+        val = st.text_area(
+        "",
+        key=f"sch_{d}",
+        placeholder="予定",
+        height=60
+    )
+    st.session_state.schedule[d] = val
 
-left, right = st.columns(2)
-with left:
-    for d in range(1, min(16, days + 1)):
-        draw_day(d)
-with right:
-    for d in range(16, days + 1):
-        draw_day(d)
+
+
+# 表（左右2列）
+colL, colR = st.columns(2)
+
+with colL:
+    for d in range(1, min(16, days+1)):
+        draw(d)
+
+with colR:
+    for d in range(16, days+1):
+        draw(d)
+
+# =========================
+# CSV保存
+# =========================
+# =========================
+# CSV保存
+# =========================
+if st.button("CSV保存"):
+    df = pd.DataFrame({
+        "日": list(range(1, days+1)),
+        "当番": [st.session_state.duty[d] for d in range(1, days+1)],
+        "予定": [st.session_state.schedule[d] for d in range(1, days+1)]
+    })
+
+    # ローカル保存（今まで通り）
+    df.to_csv(f"schedule_{year}_{month}.csv", index=False)
+
+    # ✅ 追加：ダウンロード用CSV生成
+    csv = df.to_csv(index=False).encode("utf-8-sig")
+
+    st.download_button(
+        label="CSVダウンロード",
+        data=csv,
+        file_name=f"schedule_{year}_{month}.csv",
+        mime="text/csv"
+    )
+
+    st.success("保存完了（ダウンロード可）")
+
+
+
+# =========================
+# 全クリア（重要修正済）
+# =========================
+if st.button("全クリア"):
+    for d in range(1, days+1):
+
+        st.session_state.schedule[d] = ""
+        st.session_state.duty[d] = ""
+
+        if f"duty_{d}" in st.session_state:
+            del st.session_state[f"duty_{d}"]
+
+        if f"sch_{d}" in st.session_state:
+            del st.session_state[f"sch_{d}"]
+
+    st.rerun()
 
 # =========================
 # 自動保存
 # =========================
+data = {
+    "schedule": st.session_state.schedule,
+    "duty": st.session_state.duty
+}
+
 with open(data_file, "w", encoding="utf-8") as f:
-    json.dump(st.session_state.data, f, ensure_ascii=False, indent=2)
+    json.dump(data, f, ensure_ascii=False, indent=2)
