@@ -7,7 +7,7 @@ import os
 import jpholiday
 
 # =========================
-# 基本設定
+# ページ設定 & CSS
 # =========================
 st.set_page_config(layout="wide")
 
@@ -32,6 +32,7 @@ with col_m:
 
 days = calendar.monthrange(year, month)[1]
 data_file = f"{DATA_DIR}/data_{year}_{month}.json"
+today = datetime.date.today()
 
 # =========================
 # 月変更検知
@@ -96,7 +97,7 @@ st.markdown(
 )
 
 # =========================
-# コールバック関数群（★核心）
+# コールバック関数
 # =========================
 members = ["菅原","阿部","澤","畠山","猿田","谷川","村手","武藤","小笠原","藤田"]
 
@@ -110,8 +111,7 @@ def apply_template():
     st.session_state.pop(f"sch_{d}", None)
 
 def auto_assign():
-    start = st.session_state.start_member
-    idx = members.index(start)
+    idx = members.index(st.session_state.start_member)
     for d in range(1, days + 1):
         date = datetime.date(year, month, d)
         if date.weekday() >= 5 or jpholiday.is_holiday(date):
@@ -134,7 +134,7 @@ st.sidebar.header("操作・月次設定")
 
 st.sidebar.selectbox(
     "予定テンプレ",
-    ["", "チーム会議", "外船", "安全衛生委員会","うわかい","会議","監査"],
+    ["", "チーム会議", "外船", "安全衛生委員会"],
     key="temp_sel"
 )
 
@@ -144,10 +144,7 @@ st.sidebar.number_input(
     key="day_sel"
 )
 
-st.sidebar.button(
-    "テンプレ入力",
-    on_click=apply_template
-)
+st.sidebar.button("テンプレ入力", on_click=apply_template)
 
 st.sidebar.selectbox(
     "開始当番（1日）",
@@ -155,14 +152,15 @@ st.sidebar.selectbox(
     key="start_member"
 )
 
-st.sidebar.button(
-    "当番自動割当（土日祝除外）",
-    on_click=auto_assign
-)
+st.sidebar.button("当番自動割当（土日祝除外）", on_click=auto_assign)
 
 st.sidebar.markdown("---")
 
-ms["start"] = st.sidebar.selectbox("開始当番メンバー", members, index=members.index(ms["start"]) if ms["start"] in members else 0)
+ms["start"] = st.sidebar.selectbox(
+    "開始当番メンバー",
+    members,
+    index=members.index(ms["start"]) if ms["start"] in members else 0
+)
 ms["container"] = st.sidebar.multiselect("容器", members, max_selections=3, default=ms["container"])
 ms["sample"] = st.sidebar.multiselect("サンプル", members, max_selections=3, default=ms["sample"])
 ms["oil"] = st.sidebar.multiselect("灯油", members, max_selections=3, default=ms["oil"])
@@ -171,36 +169,53 @@ st.sidebar.markdown("---")
 st.sidebar.button("全削除（この月）", on_click=clear_all)
 
 # =========================
+# 日付スタイル
+# =========================
+def day_style(d):
+    date = datetime.date(year, month, d)
+    if jpholiday.is_holiday(date):
+        return "#ffe5e5", "red"
+    if date.weekday() == 5:
+        return "#e8f0ff", "blue"
+    if date.weekday() == 6:
+        return "#ffe5e5", "red"
+    return "white", "black"
+
+# =========================
 # 表（入力部）
 # =========================
 def draw_day(d):
-    k = str(d)
+    key = str(d)
+    bg, color = day_style(d)
+    mark = "★" if datetime.date(year, month, d) == today else ""
+
     c1, c2, c3 = st.columns([0.6, 1.8, 7])
 
     with c1:
-        st.write(d)
+        st.markdown(
+            f"<div style='background:{bg};color:{color};padding:2px'>{d}{mark}</div>",
+            unsafe_allow_html=True
+        )
 
     with c2:
         val = st.text_input(
             "",
-            value=st.session_state.data["duty"][k],
+            value=st.session_state.data["duty"][key],
             key=f"duty_{d}",
             label_visibility="collapsed"
         )
-        # ★ 手入力があった時だけ反映
-        if val != st.session_state.data["duty"][k]:
-            st.session_state.data["duty"][k] = val
+        if val != st.session_state.data["duty"][key]:
+            st.session_state.data["duty"][key] = val
 
     with c3:
         val = st.text_input(
             "",
-            value=st.session_state.data["schedule"][k],
+            value=st.session_state.data["schedule"][key],
             key=f"sch_{d}",
             label_visibility="collapsed"
         )
-        # ★ 手入力があった時だけ反映
-        if val != st.session_state.data["schedule"][k]:
-            st.session_state.data["schedule"][k] = val
+        if val != st.session_state.data["schedule"][key]:
+            st.session_state.data["schedule"][key] = val
 
 left, right = st.columns(2)
 with left:
@@ -215,3 +230,4 @@ with right:
 # =========================
 with open(data_file, "w", encoding="utf-8") as f:
     json.dump(st.session_state.data, f, ensure_ascii=False, indent=2)
+``
