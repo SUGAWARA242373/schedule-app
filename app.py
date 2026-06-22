@@ -19,7 +19,6 @@ st.title("品質管理チーム月間スケジュール表")
 st.markdown("""
 <style>
 
-/* 行と行の間（全体） */
 div[data-testid="stVerticalBlock"] {
     gap: 0.02rem !important;
 
