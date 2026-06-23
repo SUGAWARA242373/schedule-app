@@ -181,7 +181,7 @@ def draw(d, y, m):
         st.markdown(
            f"<div style='color:{get_color_month(d,y,m)};font-size:22px'>{d}{mark}</div>"
             unsafe_allow_html=True
-        )
+            )
     with c2:
         st.text_input("", key=f"duty_{d}", placeholder="当番")
     with c3:
