@@ -382,6 +382,7 @@ sample = "・".join(
     )
 )
 
+
 container = "・".join(
     st.session_state.get(
         f"container_{year}_{month}",
@@ -407,6 +408,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 
 left, right = st.columns([1, 1])
 
