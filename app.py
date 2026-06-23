@@ -168,8 +168,7 @@ templates = [
     "チーム会議",
     "安全衛生委員会",
     "在庫調査日",
-    "打合せ”,
-    "出張”,
+    
     ]
 
 temp = st.sidebar.selectbox(
