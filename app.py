@@ -132,34 +132,23 @@ for d in range(1, next_days + 1):
         ""
     )
 
+
 # =========================
 # JSONロード
 # =========================
-load_flag = f"loaded_{year}_{month}"
+if os.path.exists(data_file):
 
-st.markdown("""
-<style>
-.main .block-container{
-    max-width:3000px;
-    padding-top:1rem;
-}
+    with open(data_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
 
-div[data-testid="stVerticalBlock"]{
-    gap:0.02rem !important;
-}
+    for k, v in data.items():
 
-div[data-testid="stTextInput"] input{
-    height:48px !important;
-    font-size:22px !important;
-    text-align:center !important;
-}
+        if k not in st.session_state:
+            st.session_state[k] = v
 
-textarea{
-    min-height:50px !important;
-    font-size:16px !important;
-}
-</style>
-""", unsafe_allow_html=True)
+        elif st.session_state[k] == "":
+            st.session_state[k] = v
+
 # =========================
 # サイドバー
 # =========================
