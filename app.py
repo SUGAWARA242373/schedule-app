@@ -394,8 +394,6 @@ container = "・".join(
 )
 
 
-
-    <div style="font-size:14px;margin-bottom:10px;">
         灯油管理：{oil}
         &nbsp;&nbsp;&nbsp;&nbsp;
         試料整理：{sample}
