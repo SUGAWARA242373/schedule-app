@@ -297,7 +297,7 @@ if uploaded is not None:
 # =========================
 def draw(d, y, m):
 
-    c1, c2, c3 = st.columns([1, 2, 20])
+    c1, c2, c3 = st.columns([1, 2, 16])
 
     with c1:
 
@@ -357,11 +357,7 @@ with left:
 with right:
     for d in range(16, next_days + 1):
         draw(d, next_y, next_m)
-    with right:
-
-        for d in range(16, next_days + 1):
-            draw(d, next_y, next_m)
-
+  
 # =========================
 # CSV保存
 # =========================
