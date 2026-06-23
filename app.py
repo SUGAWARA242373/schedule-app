@@ -327,19 +327,20 @@ def draw(d, y, m):
 
     c1, c2, c3 = st.columns([1, 3, 14])
 
-    with c1:
+   
+with c1:
 
-        mark = ""
+    mark = ""
 
-       
-if datetime.date(y, m, d) == datetime.date.today():
-    mark = "★"
+    if datetime.date(y, m, d) == datetime.date.today():
+        mark = "★"
 
-        st.markdown(
-            f"<div style='color:{get_color_month(d,y,m)};"
-            f"font-size:22px'>{d}{mark}</div>",
-            unsafe_allow_html=True
-        )
+    st.markdown(
+        f"<div style='color:{get_color_month(d,y,m)};"
+        f"font-size:22px'>{d}{mark}</div>",
+        unsafe_allow_html=True
+    )
+
 
     with c2:
 
