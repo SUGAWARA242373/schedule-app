@@ -393,6 +393,10 @@ container = "・".join(
     )
 )
 
+st.markdown(
+    f"""
+    <div style="font-size:24px;font-weight:bold;">
+
 
         灯油管理：{oil}
         &nbsp;&nbsp;&nbsp;&nbsp;
