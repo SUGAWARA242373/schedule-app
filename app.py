@@ -43,25 +43,21 @@ today = datetime.date.today()
 # 年月入力
 # =========================
 
+
 st.sidebar.subheader("対象年月")
 
-year = int(
-    st.sidebar.number_input(
-        "年",
-        value=today.year,
-        key="year_input"
-    )
+year = st.sidebar.selectbox(
+    "年",
+    list(range(2024, 2036)),
+    index=today.year - 2024
 )
 
-month = int(
-    st.sidebar.number_input(
-        "月",
-        1,
-        12,
-        today.month,
-        key="month_input"
-    )
+month = st.sidebar.selectbox(
+    "月",
+    list(range(1, 13)),
+    index=today.month - 1
 )
+
 
 # =========================
 # タイトル
@@ -260,17 +256,6 @@ if st.sidebar.button("当月クリア"):
 
 st.sidebar.subheader("対象年月")
 
-year = st.sidebar.selectbox(
-    "年",
-    list(range(2024, 2036)),
-    index=today.year - 2024
-)
-
-month = st.sidebar.selectbox(
-    "月",
-    list(range(1, 13)),
-    index=today.month - 1
-)
 
 st.sidebar.selectbox(
     "安全当番",
