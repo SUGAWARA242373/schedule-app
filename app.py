@@ -297,7 +297,7 @@ if uploaded is not None:
 # =========================
 def draw(d, y, m):
 
-    c1, c2, c3 = st.columns([1, 2, 16])
+    c1, c2, c3 = st.columns([1, 2, 20])
 
     with c1:
 
@@ -332,35 +332,31 @@ def draw(d, y, m):
 # =========================
 # 2か月表示
 # =========================
-month1, month2 = st.columns(2)
+st.subheader(f"{year}年 {month}月")
 
-with month1:
+left, right = st.columns([1, 1])
 
-    st.subheader(f"{year}年 {month}月")
+with left:
+    for d in range(1, min(16, days + 1)):
+        draw(d, year, month)
 
-    left, right = st.columns(2)
+with right:
+    for d in range(16, days + 1):
+        draw(d, year, month)
 
-    with left:
+st.divider()
 
-        for d in range(1, min(16, days + 1)):
-            draw(d, year, month)
+st.subheader(f"{next_y}年 {next_m}月")
 
-    with right:
+left, right = st.columns([1, 1])
 
-        for d in range(16, days + 1):
-            draw(d, year, month)
+with left:
+    for d in range(1, min(16, next_days + 1)):
+        draw(d, next_y, next_m)
 
-with month2:
-
-    st.subheader(f"{next_y}年 {next_m}月")
-
-    left, right = st.columns(2)
-
-    with left:
-
-        for d in range(1, min(16, next_days + 1)):
-            draw(d, next_y, next_m)
-
+with right:
+    for d in range(16, next_days + 1):
+        draw(d, next_y, next_m)
     with right:
 
         for d in range(16, next_days + 1):
