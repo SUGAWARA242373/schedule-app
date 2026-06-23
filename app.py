@@ -132,6 +132,28 @@ for d in range(1, next_days + 1):
         ""
     )
 
+# 月間担当 初期化
+# =========================
+st.session_state.setdefault(
+    f"safe_{year}_{month}",
+    ""
+)
+
+st.session_state.setdefault(
+    f"oil_{year}_{month}",
+    []
+)
+
+st.session_state.setdefault(
+    f"sample_{year}_{month}",
+    []
+)
+
+st.session_state.setdefault(
+    f"container_{year}_{month}",
+    []
+)
+
 
 # =========================
 # JSONロード
@@ -238,6 +260,11 @@ if st.sidebar.button("当月クリア"):
             f"sch_{year}_{month}_{d}"
         ] = ""
 
+st.session_state[f"safe_{year}_{month}"] = ""
+st.session_state[f"oil_{year}_{month}"] = []
+st.session_state[f"sample_{year}_{month}"] = []
+st.session_state[f"container_{year}_{month}"] = []
+
 st.sidebar.subheader("月間担当")
 
 st.sidebar.selectbox(
@@ -343,9 +370,52 @@ def draw(d, y, m):
 # =========================
 # 2か月表示
 # =========================
-head1, head2 = st.columns([2,3])
 
-with head1:
+safe = st.session_state.get(
+    f"safe_{year}_{month}",
+    ""
+)
+
+oil = "・".join(
+    st.session_state.get(
+        f"oil_{year}_{month}",
+        []
+    )
+)
+
+sample = "・".join(
+    st.session_state.get(
+        f"sample_{year}_{month}",
+        []
+    )
+)
+
+container = "・".join(
+    st.session_state.get(
+        f"container_{year}_{month}",
+        []
+    )
+)
+
+st.markdown(
+    f"""
+    <div style="font-size:24px;font-weight:bold;">
+        {year}年{month}月
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        安全当番：{safe}
+    </div>
+
+    <div style="font-size:14px;margin-bottom:10px;">
+        灯油管理：{oil}
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        試料整理：{sample}
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        容器整理：{container}
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
   
 safe = st.session_state.get(
     f"safe_{year}_{month}",
@@ -450,12 +520,21 @@ st.download_button(
 # =========================
 # 自動保存
 # =========================
+
+
 save_data = {
     k: v
     for k, v in st.session_state.items()
-    if k.startswith("duty_")
-    or k.startswith("sch_")
+    if (
+        k.startswith("duty_")
+        or k.startswith("sch_")
+        or k.startswith("safe_")
+        or k.startswith("oil_")
+        or k.startswith("sample_")
+        or k.startswith("container_")
+    )
 }
+
 
 with open(
     data_file,
