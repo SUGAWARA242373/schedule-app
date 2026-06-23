@@ -367,6 +367,7 @@ def draw(d, y, m):
 # 2か月表示
 # =========================
 
+# ---------- 当月 ----------
 safe = st.session_state.get(
     f"safe_{year}_{month}",
     ""
@@ -396,8 +397,12 @@ container = "・".join(
 st.markdown(
     f"""
     <div style="font-size:24px;font-weight:bold;">
+        {year}年{month}月
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        安全当番：{safe}
+    </div>
 
-
+    <div style="font-size:14px;margin-bottom:10px;">
         灯油管理：{oil}
         &nbsp;&nbsp;&nbsp;&nbsp;
         試料整理：{sample}
@@ -407,53 +412,6 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
-  
-safe = st.session_state.get(
-    f"safe_{year}_{month}",
-    ""
-)
-
-oil = "・".join(
-    st.session_state.get(
-        f"oil_{year}_{month}",
-        []
-    )
-)
-
-sample = "・".join(
-    st.session_state.get(
-        f"sample_{year}_{month}",
-        []
-    )
-)
-
-container = "・".join(
-    st.session_state.get(
-        f"container_{year}_{month}",
-        []
-    )
-)
-
-st.markdown(
-    f"""
-    <div style="font-size:24px;font-weight:bold;">
-    {year}年{month}月
-    &nbsp;&nbsp;&nbsp;&nbsp;
-    安全当番：{safe}
-    </div>
-
-    <div style="font-size:14px;margin-bottom:10px;">
-    灯油管理：{oil}
-    &nbsp;&nbsp;&nbsp;&nbsp;
-    試料整理：{sample}
-    &nbsp;&nbsp;&nbsp;&nbsp;
-    容器整理：{container}
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
 
 left, right = st.columns([1, 1])
 
@@ -467,7 +425,51 @@ with right:
 
 st.divider()
 
-st.subheader(f"{next_y}年 {next_m}月")
+# ---------- 翌月 ----------
+safe2 = st.session_state.get(
+    f"safe_{next_y}_{next_m}",
+    ""
+)
+
+oil2 = "・".join(
+    st.session_state.get(
+        f"oil_{next_y}_{next_m}",
+        []
+    )
+)
+
+sample2 = "・".join(
+    st.session_state.get(
+        f"sample_{next_y}_{next_m}",
+        []
+    )
+)
+
+container2 = "・".join(
+    st.session_state.get(
+        f"container_{next_y}_{next_m}",
+        []
+    )
+)
+
+st.markdown(
+    f"""
+    <div style="font-size:24px;font-weight:bold;">
+        {next_y}年{next_m}月
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        安全当番：{safe2}
+    </div>
+
+    <div style="font-size:14px;margin-bottom:10px;">
+        灯油管理：{oil2}
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        試料整理：{sample2}
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        容器整理：{container2}
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 left, right = st.columns([1, 1])
 
