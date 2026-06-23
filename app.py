@@ -297,7 +297,7 @@ if uploaded is not None:
 # =========================
 def draw(d, y, m):
 
-    c1, c2, c3 = st.columns([1, 2, 14])
+    c1, c2, c3 = st.columns([1, 2.5, 14])
 
     with c1:
 
