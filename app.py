@@ -17,7 +17,8 @@ month = st.number_input("月", 1, 12, 6, key="month_input")
 days = calendar.monthrange(year, month)[1]
 today = datetime.date.today()
 data_file = f"data_{year}_{month}.json"
-
+next_y, next_m = next_month_info(year, month)
+next_days = calendar.monthrange(next_y, next_m)[1]
 # =========================
 # タイトル
 # =========================
@@ -54,6 +55,19 @@ textarea { min-height: 50px !important; font-size: 16px !important; }
 for d in range(1, days + 1):
     st.session_state.setdefault(f"duty_{d}", "")
     st.session_state.setdefault(f"sch_{d}", "")
+
+# =========================
+# 翌月分 widget state 初期化（⑤）
+# =========================
+for d in range(1, next_days + 1):
+    st.session_state.setdefault(
+        f"duty_{next_y}_{next_m}_{d}",
+        ""
+    )
+    st.session_state.setdefault(
+        f"sch_{next_y}_{next_m}_{d}",
+        ""
+    )
 
 # =========================
 # JSONロード（初回のみ）
@@ -114,9 +128,24 @@ if st.sidebar.button("全クリア"):
 # =========================
 # 表示
 # =========================
-def get_color(d):
-    wd = datetime.date(year, month, d).weekday()
-    return "blue" if wd == 5 else "red" if wd == 6 else "black"
+
+def next_month_info(year, month):
+    if month == 12:
+        return year + 1, 1
+    return year, month + 1
+
+
+def get_color_month(d, y, m):
+    wd = datetime.date(y, m, d).weekday()
+
+    if wd == 5:
+        return "blue"
+
+    if wd == 6:
+        return "red"
+
+    return "black"
+
 
 
 # =========================
@@ -145,12 +174,12 @@ if st.session_state.get("csv_pending", False):
 
     st.success("CSVを読み込みました")
 
-def draw(d):
+def draw(d, y, m):
     c1, c2, c3 = st.columns([1, 2, 6])
     with c1:
-        mark = "★" if datetime.date(year, month, d) == today else ""
+        mark = "★" if datetime.date(y, m, d) == today else ""
         st.markdown(
-            f"<div style='color:{get_color(d)};font-size:22px'>{d}{mark}</div>",
+           f"<div style='color:{get_color_month(d,y,m)};font-size:22px'>{d}{mark}</div>"
             unsafe_allow_html=True
         )
     with c2:
@@ -158,13 +187,37 @@ def draw(d):
     with c3:
         st.text_area("", key=f"sch_{d}", placeholder="予定", height=50)
 
-colL, colR = st.columns(2)
-with colL:
-    for d in range(1, min(16, days + 1)):
-        draw(d)
-with colR:
-    for d in range(16, days + 1):
-        draw(d)
+
+month1, month2 = st.columns(2)
+
+with month1:
+
+    st.subheader(f"{year}年 {month}月")
+
+    left,right = st.columns(2)
+
+    with left:
+        for d in range(1, min(16, days + 1)):
+            draw(d, year, month)
+
+    with right:
+        for d in range(16, days + 1):
+            draw(d, year, month)
+
+with month2:
+
+    st.subheader(f"{next_y}年 {next_m}月")
+
+    left,right = st.columns(2)
+
+    with left:
+        for d in range(1, min(16, next_days + 1)):
+            draw(d, next_y, next_m)
+
+    with right:
+        for d in range(16, next_days + 1):
+            draw(d, next_y, next_m)
+
 
 # =========================
 # CSV保存
