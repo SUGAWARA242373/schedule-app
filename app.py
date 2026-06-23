@@ -100,12 +100,12 @@ div[data-testid="stVerticalBlock"]{
 
 div[data-testid="stTextInput"] input{
     height:48px !important;
-    font-size:22px !important;
+    font-size:18px !important;
     text-align:center !important;
 }
 
 textarea{
-    min-height:50px !important;
+    min-height:30px !important;
     font-size:12px !important;
 }
 </style>
