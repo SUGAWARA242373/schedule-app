@@ -256,6 +256,24 @@ if st.sidebar.button("当月クリア"):
 
 st.sidebar.subheader("対象年月")
 
+year = st.sidebar.selectbox(
+    "年",
+    list(range(2024, 2036)),
+    index=today.year - 2024
+)
+
+month = st.sidebar.selectbox(
+    "月",
+    list(range(1, 13)),
+    index=today.month - 1
+)
+
+days = calendar.monthrange(year, month)[1]
+
+next_y, next_m = next_month_info(year, month)
+next_days = calendar.monthrange(next_y, next_m)[1]
+
+data_file = f"data_{year}_{month}.json"
 
 st.sidebar.selectbox(
     "安全当番",
