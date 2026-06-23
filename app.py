@@ -37,22 +37,26 @@ def get_color_month(d, y, m):
 
 today = datetime.date.today()
 
+
 # =========================
 # 年月入力
 # =========================
-
-st.sidebar.subheader("対象年月")
-
-year = st.sidebar.selectbox(
-    "年",
-    list(range(2024, 2031)),
-    index=2  # 2026
+year = int(
+    st.number_input(
+        "年",
+        value=today.year,
+        key="year_input"
+    )
 )
 
-month = st.sidebar.selectbox(
-    "月",
-    list(range(1, 13)),
-    index=today.month - 1
+month = int(
+    st.number_input(
+        "月",
+        1,
+        12,
+        today.month,
+        key="month_input"
+    )
 )
 
 # =========================
