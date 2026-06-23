@@ -260,10 +260,6 @@ if st.sidebar.button("当月クリア"):
             f"sch_{year}_{month}_{d}"
         ] = ""
 
-st.session_state[f"safe_{year}_{month}"] = ""
-st.session_state[f"oil_{year}_{month}"] = []
-st.session_state[f"sample_{year}_{month}"] = []
-st.session_state[f"container_{year}_{month}"] = []
 
 st.sidebar.subheader("月間担当")
 
