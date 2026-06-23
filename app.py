@@ -78,9 +78,7 @@ st.markdown(
     <div style="font-size:40px;font-weight:800;">
         品質管理チーム月間スケジュール表
     </div>
-    <div style="font-size:32px;margin-bottom:20px;">
-        {year}年 {month}月
-    </div>
+   
     """,
     unsafe_allow_html=True
 )
