@@ -89,25 +89,17 @@ st.markdown(
 # =========================
 st.markdown("""
 <style>
-.main .block-container{
-    max-width:3000px;
-    padding-top:1rem;
-}
-
-div[data-testid="stVerticalBlock"]{
-    gap:0.02rem !important;
-}
 
 div[data-testid="stTextInput"] input{
     height:28px !important;
     font-size:10px !important;
-    text-align:center !important;
 }
 
-textarea{
-    min-height:20px !important;
+div[data-testid="stTextArea"] textarea{
+    min-height:25px !important;
     font-size:10px !important;
 }
+
 </style>
 """, unsafe_allow_html=True)
 # =========================
