@@ -1,6 +1,25 @@
 import streamlit as st
 import pandas as pd
 import calendar
+
+def prev_month_info(year, month):
+    if month == 1:
+        return year - 1, 12
+    return year, month - 1
+
+def next_month_info(year, month):
+    if month == 12:
+        return year + 1, 1
+    return year, month + 1
+
+today = datetime.date.today()
+
+year = today.year
+month = today.month
+
+prev_y, prev_m = prev_month_info(year, month)
+next_y, next_m = next_month_info(year, month)
+
 import datetime
 import json
 import os
