@@ -59,6 +59,13 @@ month = int(
     )
 )
 
+days = calendar.monthrange(year, month)[1]
+
+next_y, next_m = next_month_info(year, month)
+next_days = calendar.monthrange(next_y, next_m)[1]
+
+data_file = f"data_{year}_{month}.json"
+
 # =========================
 # タイトル
 # =========================
