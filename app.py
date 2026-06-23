@@ -91,13 +91,13 @@ st.markdown("""
 <style>
 
 div[data-testid="stTextInput"] input{
-    height:28px !important;
-    font-size:10px !important;
+    height:30px !important;
+    font-size:14px !important;
 }
 
 div[data-testid="stTextArea"] textarea{
-    min-height:25px !important;
-    font-size:10px !important;
+    min-height:30px !important;
+    font-size:14px !important;
 }
 
 </style>
