@@ -353,8 +353,9 @@ def draw(d, y, m):
 
         mark = ""
 
-        if datetime.date(y, m, d) == today:
-            mark = "★"
+       
+if datetime.date(y, m, d) == datetime.date.today():
+    mark = "★"
 
         st.markdown(
             f"<div style='color:{get_color_month(d,y,m)};"
