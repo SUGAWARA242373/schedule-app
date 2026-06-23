@@ -97,7 +97,7 @@ div[data-testid="stTextInput"] input{
 
 div[data-testid="stTextArea"] textarea{
     min-height:48px !important;
-    font-size:14px !important;
+    font-size:12px !important;
 }
 
 </style>
