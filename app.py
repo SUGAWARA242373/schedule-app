@@ -314,7 +314,23 @@ def draw(d, y, m):
 # =========================
 # 2か月表示
 # =========================
-st.subheader(f"{year}年 {month}月")
+head1, head2 = st.columns([2,3])
+
+with head1:
+    st.subheader(f"{year}年 {month}月")
+
+with head2:
+    st.markdown(
+        f"""
+        **安全当番** ：{st.session_state.get(f"safe_{year}_{month}", "")}
+
+        **灯油管理** ：{"・".join(st.session_state.get(f"oil_{year}_{month}", []))}
+
+        **試料整理** ：{"・".join(st.session_state.get(f"sample_{year}_{month}", []))}
+
+        **容器整理** ：{"・".join(st.session_state.get(f"container_{year}_{month}", []))}
+        """
+    )
 
 left, right = st.columns([1, 1])
 
