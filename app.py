@@ -393,13 +393,7 @@ container = "・".join(
     )
 )
 
-st.markdown(
-    f"""
-    <div style="font-size:24px;font-weight:bold;">
-        {year}年{month}月
-        &nbsp;&nbsp;&nbsp;&nbsp;
-        安全当番：{safe}
-    </div>
+
 
     <div style="font-size:14px;margin-bottom:10px;">
         灯油管理：{oil}
