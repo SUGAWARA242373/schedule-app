@@ -68,6 +68,10 @@ data_file = f"data_{year}_{month}.json"
 # =========================
 # タイトル
 # =========================
+
+st.info(
+    "入力内容は月毎に自動保存されます。"
+)
 st.markdown(
     f"""
     <div style="font-size:40px;font-weight:800;">
@@ -85,23 +89,27 @@ st.markdown(
 # =========================
 st.markdown("""
 <style>
-div[data-testid="stVerticalBlock"] {
-    gap: 0.02rem !important;
+.main .block-container{
+    max-width:3000px;
+    padding-top:1rem;
 }
 
-div[data-testid="stTextInput"] input {
-    height: 48px !important;
-    font-size: 22px !important;
-    text-align: center !important;
+div[data-testid="stVerticalBlock"]{
+    gap:0.02rem !important;
 }
 
-textarea {
-    min-height: 50px !important;
-    font-size: 16px !important;
+div[data-testid="stTextInput"] input{
+    height:48px !important;
+    font-size:22px !important;
+    text-align:center !important;
+}
+
+textarea{
+    min-height:50px !important;
+    font-size:16px !important;
 }
 </style>
 """, unsafe_allow_html=True)
-
 # =========================
 # State初期化（当月）
 # =========================
@@ -137,16 +145,29 @@ for d in range(1, next_days + 1):
 # =========================
 load_flag = f"loaded_{year}_{month}"
 
-if os.path.exists(data_file) and not st.session_state.get(load_flag, False):
+st.markdown("""
+<style>
+.main .block-container{
+    max-width:3000px;
+    padding-top:1rem;
+}
 
-    with open(data_file, "r", encoding="utf-8") as f:
-        data = json.load(f)
+div[data-testid="stVerticalBlock"]{
+    gap:0.02rem !important;
+}
 
-    for k, v in data.items():
-        st.session_state[k] = v
+div[data-testid="stTextInput"] input{
+    height:48px !important;
+    font-size:22px !important;
+    text-align:center !important;
+}
 
-    st.session_state[load_flag] = True
-
+textarea{
+    min-height:50px !important;
+    font-size:16px !important;
+}
+</style>
+""", unsafe_allow_html=True)
 # =========================
 # サイドバー
 # =========================
@@ -223,7 +244,7 @@ if st.sidebar.button("当番自動割当（平日のみ）"):
 
             idx += 1
 
-if st.sidebar.button("全クリア"):
+if st.sidebar.button("当月クリア"):
 
     for d in range(1, days + 1):
 
@@ -276,7 +297,7 @@ if uploaded is not None:
 # =========================
 def draw(d, y, m):
 
-    c1, c2, c3 = st.columns([1, 2, 6])
+    c1, c2, c3 = st.columns([1, 2, 16])
 
     with c1:
 
