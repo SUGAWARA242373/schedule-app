@@ -106,7 +106,7 @@ div[data-testid="stTextInput"] input{
 
 textarea{
     min-height:50px !important;
-    font-size:16px !important;
+    font-size:12px !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -297,7 +297,7 @@ if uploaded is not None:
 # =========================
 def draw(d, y, m):
 
-    c1, c2, c3 = st.columns([1, 2.5, 14])
+    c1, c2, c3 = st.columns([1, 3, 14])
 
     with c1:
 
