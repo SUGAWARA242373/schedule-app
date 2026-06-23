@@ -238,6 +238,35 @@ if st.sidebar.button("当月クリア"):
             f"sch_{year}_{month}_{d}"
         ] = ""
 
+st.sidebar.subheader("月間担当")
+
+st.sidebar.selectbox(
+    "安全当番",
+    members,
+    key=f"safe_{year}_{month}"
+)
+
+st.sidebar.multiselect(
+    "灯油管理",
+    members,
+    max_selections=3,
+    key=f"oil_{year}_{month}"
+)
+
+st.sidebar.multiselect(
+    "試料整理",
+    members,
+    max_selections=3,
+    key=f"sample_{year}_{month}"
+)
+
+st.sidebar.multiselect(
+    "容器整理",
+    members,
+    max_selections=3,
+    key=f"container_{year}_{month}"
+)
+
 # =========================
 # CSV読込
 # =========================
@@ -317,20 +346,52 @@ def draw(d, y, m):
 head1, head2 = st.columns([2,3])
 
 with head1:
-    st.subheader(f"{year}年 {month}月")
+  
+safe = st.session_state.get(
+    f"safe_{year}_{month}",
+    ""
+)
 
-with head2:
-    st.markdown(
-        f"""
-        **安全当番** ：{st.session_state.get(f"safe_{year}_{month}", "")}
-
-        **灯油管理** ：{"・".join(st.session_state.get(f"oil_{year}_{month}", []))}
-
-        **試料整理** ：{"・".join(st.session_state.get(f"sample_{year}_{month}", []))}
-
-        **容器整理** ：{"・".join(st.session_state.get(f"container_{year}_{month}", []))}
-        """
+oil = "・".join(
+    st.session_state.get(
+        f"oil_{year}_{month}",
+        []
     )
+)
+
+sample = "・".join(
+    st.session_state.get(
+        f"sample_{year}_{month}",
+        []
+    )
+)
+
+container = "・".join(
+    st.session_state.get(
+        f"container_{year}_{month}",
+        []
+    )
+)
+
+st.markdown(
+    f"""
+    <div style="font-size:24px;font-weight:bold;">
+    {year}年{month}月
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    安全当番：{safe}
+    </div>
+
+    <div style="font-size:14px;margin-bottom:10px;">
+    灯油管理：{oil}
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    試料整理：{sample}
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    容器整理：{container}
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 
 left, right = st.columns([1, 1])
 
