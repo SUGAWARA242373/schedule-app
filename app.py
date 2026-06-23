@@ -431,7 +431,26 @@ safe2 = st.session_state.get(
     ""
 )
 
+oil2 = "・".join(
+    st.session_state.get(
+        f"oil_{next_y}_{next_m}",
+        []
+    )
+)
 
+sample2 = "・".join(
+    st.session_state.get(
+        f"sample_{next_y}_{next_m}",
+        []
+    )
+)
+
+container2 = "・".join(
+    st.session_state.get(
+        f"container_{next_y}_{next_m}",
+        []
+    )
+)
 
 st.markdown(
     f"""
