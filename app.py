@@ -99,14 +99,14 @@ div[data-testid="stVerticalBlock"]{
 }
 
 div[data-testid="stTextInput"] input{
-    height:48px !important;
-    font-size:18px !important;
+    height:28px !important;
+    font-size:10px !important;
     text-align:center !important;
 }
 
 textarea{
-    min-height:30px !important;
-    font-size:12px !important;
+    min-height:20px !important;
+    font-size:10px !important;
 }
 </style>
 """, unsafe_allow_html=True)
