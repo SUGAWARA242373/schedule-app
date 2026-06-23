@@ -40,30 +40,20 @@ today = datetime.date.today()
 # =========================
 # 年月入力
 # =========================
-year = int(
-    st.number_input(
-        "年",
-        value=today.year,
-        key="year_input"
-    )
+
+st.sidebar.subheader("対象年月")
+
+year = st.sidebar.selectbox(
+    "年",
+    list(range(2024, 2031)),
+    index=2  # 2026
 )
 
-month = int(
-    st.number_input(
-        "月",
-        1,
-        12,
-        today.month,
-        key="month_input"
-    )
+month = st.sidebar.selectbox(
+    "月",
+    list(range(1, 13)),
+    index=today.month - 1
 )
-
-days = calendar.monthrange(year, month)[1]
-
-next_y, next_m = next_month_info(year, month)
-next_days = calendar.monthrange(next_y, next_m)[1]
-
-data_file = f"data_{year}_{month}.json"
 
 # =========================
 # タイトル
