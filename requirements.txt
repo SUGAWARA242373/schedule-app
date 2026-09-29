@@ -1,3 +1,6 @@
 streamlit
 pandas
 jpholiday
+requirements.txt
+msal
+requests
