@@ -559,17 +559,20 @@ st.sidebar.selectbox(
 )
 
 
-year = int(
-    st.session_state["selected_year"]
-)
-
-month = int(
-    st.session_state["selected_month"]
-)
+year = int(st.session_state["selected_year"])
+month = int(st.session_state["selected_month"])
 
 days = calendar.monthrange(
     year,
     month,
 )[1]
 
-next_y, next_m = next_
+next_y, next_m = next_month_info(
+    year,
+    month,
+)
+
+next_days = calendar.monthrange(
+    next_y,
+    next_m,
+)[1]
