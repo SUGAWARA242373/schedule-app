@@ -156,63 +156,162 @@ def create_all_data_csv():
 def load_all_data_csv(uploaded_file):
     """
     全データCSVからスケジュールデータをsession_stateへ復元する。
-
-    戻り値:
-        読み込んだデータ件数
+    CSV内部の値がJSON形式でも通常文字列でも読み込めるようにする。
     """
+
+    # Streamlit UploadedFile を先頭に戻す
+    uploaded_file.seek(0)
+
+    # バイトデータとして取得
+    raw_data = uploaded_file.read()
+
+    # UTF-8 BOM付き / BOMなし両方に対応
+    try:
+        text_data = raw_data.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        try:
+            text_data = raw_data.decode("cp932")
+        except UnicodeDecodeError:
+            text_data = raw_data.decode(
+                "utf-8",
+                errors="replace"
+            )
+
+    # CSV読込み
     loaded_df = pd.read_csv(
-        uploaded_file,
-        encoding="utf-8-sig",
+        io.StringIO(text_data),
         dtype=str,
         keep_default_na=False,
     )
+
+    # 列名の余分な空白を除去
+    loaded_df.columns = [
+        str(column).strip()
+        for column in loaded_df.columns
+    ]
 
     required_columns = {
         "key",
         "value_json",
     }
 
-    if not required_columns.issubset(loaded_df.columns):
+    if not required_columns.issubset(
+        loaded_df.columns
+    ):
         raise ValueError(
-            "全データCSVには"
-            "「key」「value_json」の2列が必要です。"
+            "保存ファイルの形式が正しくありません。"
+            "必要な列：key, value_json / "
+            f"実際の列：{list(loaded_df.columns)}"
         )
 
     loaded_count = 0
+    skipped_count = 0
 
     for _, row in loaded_df.iterrows():
-        key = str(row["key"]).strip()
-        value_text = str(row["value_json"])
 
-        if not is_schedule_key(key):
+        key = str(
+            row.get("key", "")
+        ).strip()
+
+        value_text = str(
+            row.get("value_json", "")
+        ).strip()
+
+        # 空キーを無視
+        if not key:
+            skipped_count += 1
             continue
 
+        # スケジュールキー以外は無視
+        if not is_schedule_key(key):
+            skipped_count += 1
+            continue
+
+        # -----------------------------
+        # 値の復元
+        # -----------------------------
         try:
             value = json.loads(value_text)
 
-        except json.JSONDecodeError:
-            # 古い形式や手修正されたCSVにも対応するため、
-            # JSONとして読めない場合は文字列として扱う
+        except (
+            json.JSONDecodeError,
+            TypeError,
+        ):
+            # JSONとして読めなくても
+            # 通常の文字列として読み込む
             value = value_text
 
+        # -----------------------------
+        # safe_
+        # -----------------------------
+        if key.startswith("safe_"):
+
+            if value in (
+                "",
+                "None",
+                "null",
+            ):
+                value = None
+
+            elif value not in members:
+                value = None
+
+        # -----------------------------
+        # multiselect系
+        # -----------------------------
+        elif key.startswith(
+            (
+                "oil_",
+                "sample_",
+                "container_",
+            )
+        ):
+
+            if isinstance(value, list):
+
+                value = [
+                    member
+                    for member in value
+                    if member in members
+                ]
+
+            elif value in (
+                "",
+                "None",
+                "null",
+            ):
+
+                value = []
+
+            else:
+                # 念のため文字列から復旧
+                value = [
+                    item.strip()
+                    for item in str(value).split(",")
+                    if item.strip() in members
+                ]
+
+        # -----------------------------
+        # duty / schedule
+        # -----------------------------
+        elif key.startswith(
+            (
+                "duty_",
+                "sch_",
+            )
+        ):
+
+            if value is None:
+                value = ""
+
+            else:
+                value = str(value)
+
         st.session_state[key] = value
+
         loaded_count += 1
 
-    return loaded_count
-
-
-# =========================================================
-# 年月セッション初期化
-# =========================================================
-st.session_state.setdefault(
-    "selected_year",
-    today.year,
-)
-
-st.session_state.setdefault(
-    "selected_month",
-    today.month,
-)
+    return loaded_count, skipped_count
 
 
 # =========================================================
@@ -705,20 +804,21 @@ if uploaded_all_data is not None:
         != upload_id
     ):
         try:
-            loaded_count = load_all_data_csv(
-                uploaded_all_data
-            )
+          loaded_count, skipped_count = load_all_data_csv(
+    uploaded_all_data
+)
 
             st.session_state[
                 "last_uploaded_all_data"
             ] = upload_id
 
             st.session_state[
-                "operation_message"
-            ] = (
-                f"全期間の保存データを"
-                f"{loaded_count}件読み込みました。"
-            )
+    "operation_message"
+] = (
+    f"全期間の保存データを"
+    f"{loaded_count}件読み込みました。"
+    f"（スキップ：{skipped_count}件）"
+)
 
             st.rerun()
 
