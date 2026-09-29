@@ -804,21 +804,21 @@ if uploaded_all_data is not None:
         != upload_id
     ):
         try:
-          loaded_count, skipped_count = load_all_data_csv(
-    uploaded_all_data
-)
+            loaded_count, skipped_count = load_all_data_csv(
+                uploaded_all_data
+            )
 
             st.session_state[
                 "last_uploaded_all_data"
             ] = upload_id
 
             st.session_state[
-    "operation_message"
-] = (
-    f"全期間の保存データを"
-    f"{loaded_count}件読み込みました。"
-    f"（スキップ：{skipped_count}件）"
-)
+                "operation_message"
+            ] = (
+                f"全期間の保存データを"
+                f"{loaded_count}件読み込みました。"
+                f"（スキップ：{skipped_count}件）"
+            )
 
             st.rerun()
 
@@ -827,8 +827,6 @@ if uploaded_all_data is not None:
                 "全入力データの読込みに失敗しました。"
                 f"詳細: {error}"
             )
-
-
 # =========================================================
 # 当月CSV読込み
 # =========================================================
