@@ -349,10 +349,21 @@ def move_next_month():
 # =========================================================
 # サイドバー 年月選択
 # =========================================================
+
+# 初回起動時の年月を設定
+st.session_state.setdefault(
+    "selected_year",
+    today.year,
+)
+
+st.session_state.setdefault(
+    "selected_month",
+    today.month,
+)
+
 st.sidebar.subheader("対象年月")
 
 year_list = list(range(2024, 2036))
-
 if st.session_state["selected_year"] not in year_list:
     st.session_state["selected_year"] = today.year
 
